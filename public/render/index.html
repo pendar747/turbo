@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../dist/default-theme.css">
+  <title>Render</title>
+</head>
+<body state="my-app">
+
+  <template id="template-2">
+    <div>
+      This is my comment.
+    </div>
+    <div>- {name}</div>
+  </template>
+
+  <template id="my-template">
+    <div>My name is {name}.</div>
+    <tb-render model="person" template="template-2"></tb-render>
+  </template>
+
+  <tb-render model="person" template="my-template"></tb-render>
+  
+  <script type="module" src="./script.js"></script>
+</body>
+</html>
