@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../dist/default-theme.css">
-  <title>Render</title>
+  <title>tb-render</title>
 </head>
 <body state="my-app">
-  <h1>Render</h1>
+  <h1>tb-render</h1>
 
-  <h2>Nested Render</h2>
+  <h2>Nested tb-render</h2>
   <template id="template-2">
     <div>
       This is my comment.
@@ -22,7 +22,7 @@
   </template>
   <tb-render model="person" template="my-template"></tb-render>
 
-  <h2>Render list</h2>
+  <h2>tb-render list</h2>
   <template id="list-template">
     <style>
       .contact {
@@ -37,7 +37,7 @@
   </template>
   <tb-render model="contacts" template="list-template"></tb-render>
 
-  <h2>Render list with nested templates</h2>
+  <h2>tb-render list with nested templates</h2>
   <template id="list-with-nested-list">
     <style>
       .contact {
@@ -53,9 +53,16 @@
   </template>
   <tb-render model="contacts" template="list-with-nested-list"></tb-render>
 
-  <h2>Render with if condition</h2>
+  <h2>tb-render with if condition</h2>
   <template id="friends-count">Friends ({numberOfFriends}):</template>
-  <template id="no-friends">{name} has no friends.</template>
+  <template id="no-friends">
+    <style>
+      span {
+        color: lightcoral;
+      }
+    </style>
+    <span>{name} has no friends.</span>
+  </template>
   <template id="list-with-condition">
     <style>
       .contact {
