@@ -7,6 +7,18 @@ export default class Render extends TurboComponent {
   @property()
   template: string|null = null;
 
+  @property()
+  if: string|null = null;
+
+  @property()
+  ifValue: string|null = null;
+
+  @property()
+  unless: string|null = null;
+
+  @property()
+  unlessValue: string|null = null;
+
   private get templateContent () {
     return this.template ? document.getElementById(this.template)?.innerHTML || '' : '';
   }
@@ -26,8 +38,26 @@ export default class Render extends TurboComponent {
     if (this.modelValue === null || this.modelValue === undefined) {
       return;
     }
-    return Array.isArray(this.modelValue) 
+    const content = Array.isArray(this.modelValue) 
       ? html`<div id="container">${this.renderElements()}</div>`
       : html`<div id="container" .innerHTML="${renderContent(this.templateContent)(this.modelValue)}"></div>`;
+
+    if (this.if) {
+      return html`<tb-if model="${this.if}">${content}</tb-if>`;
+    }
+
+    if (this.ifValue) {
+      return html`<tb-if value="${this.ifValue}">${content}</tb-if>`;
+    }
+
+    if (this.unless) {
+      return html`<tb-unless model="${this.unless}">${content}</tb-unless>`;
+    }
+    
+    if (this.unlessValue) {
+      return html`<tb-unless value="${this.unlessValue}">${content}</tb-unless>`;
+    }
+
+    return content;
   }
 }

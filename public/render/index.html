@@ -52,6 +52,28 @@
     </div>
   </template>
   <tb-render model="contacts" template="list-with-nested-list"></tb-render>
+
+  <h2>Render with if condition</h2>
+  <template id="friends-count">Friends ({numberOfFriends}):</template>
+  <template id="no-friends">{name} has no friends.</template>
+  <template id="list-with-condition">
+    <style>
+      .contact {
+        padding: 10px;
+      }
+    </style>
+    <div class="contact">
+      <div>Name: {name}</div>
+      <div>Tel: {tel}</div>
+      <div>Address: {address}</div>
+      <div class="friends">
+        <tb-render unlessValue="{hasFriends}" value="{this}" template="no-friends"></tb-render>
+        <tb-render ifValue="{hasFriends}" value="{this}" template="friends-count"></tb-render>
+        <tb-render value="{friends}" template="list-with-condition"></tb-render>
+      </div>
+    </div>
+  </template>
+  <tb-render model="contacts" template="list-with-condition"></tb-render>
   
   <script type="module" src="./script.js"></script>
 </body>

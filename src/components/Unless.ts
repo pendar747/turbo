@@ -4,9 +4,6 @@ import TurboComponent from "./TurboComponent";
 @customElement('tb-unless')
 export default class Unless extends TurboComponent {
 
-  @property()
-  public value: string|null = null;
-
   get condition (): boolean {
     return this.model ? Boolean(this.modelValue) : this.value == 'true';
   }

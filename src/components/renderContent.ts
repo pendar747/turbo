@@ -2,6 +2,8 @@ import format from 'string-template';
 import isNil from 'lodash/isNil';
 import mapValues from 'lodash/mapValues';
 
+// TODO: write own rendering replacement to have better control
+// currently array properties are not replaced (e.g. Array.length)
 const findMissingVariables = (text: string, data: any) => {
   const props = text.match(/\{[0-9a-zA-Z]+\}/g) || [];
   return props
