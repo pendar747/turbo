@@ -11,12 +11,6 @@ export default abstract class TurboComponent extends LitElement {
   @property()
   value: string|null = null;
 
-  get modelValues (): any[] {
-    return Array.isArray(this.modelValue) 
-      ? this.modelValue 
-      : this.modelValue === null ? [] : [this.modelValue];
-  }
-
   protected modelValue: any = null;
   
   get modelContextObject () {

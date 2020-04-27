@@ -30,9 +30,9 @@ export default [
       string({
         include: "**/*.css"
       }),
-      visualizer({
-        filename: 'reports/bundle-analysis.html'
-      })
+      // visualizer({
+      //   filename: 'reports/bundle-analysis.html'
+      // })
     ],
     output: [
       { format: 'cjs', file: pkg.main },

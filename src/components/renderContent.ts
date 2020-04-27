@@ -1,5 +1,6 @@
 import format from 'string-template';
 import isNil from 'lodash/isNil';
+import mapValues from 'lodash/mapValues';
 
 const findMissingVariables = (text: string, data: any) => {
   const props = text.match(/\{[0-9a-zA-Z]+\}/g) || [];
@@ -12,7 +13,10 @@ export const jsonStringifyForHTML = (item: any) => typeof item === 'object' ? JS
 
 export const renderContent = (template: string, as: string) => (item: any): string => {
   const json = jsonStringifyForHTML(item);
-  let data = { ...item, [as]: json };
+  const props = mapValues(item, (value) => {
+    return value !== null && typeof value === 'object' ? jsonStringifyForHTML(value) : value;
+  })
+  let data = { ...props, [as]: json };
   const missingProps = findMissingVariables(template, data);
   missingProps.forEach(propName => {
     data[propName] = `{${propName}}`
