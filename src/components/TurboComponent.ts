@@ -13,27 +13,9 @@ export default abstract class TurboComponent extends LitElement {
 
   protected modelValue: any = null;
   
-  get modelContextObject () {
-    if (this.modelContext) {
-      try {
-        return JSON.parse(this.modelContext?.replace(/'/g, '"'));
-      } catch (error) {
-        return {}
-      }
-    }
-    return {};
-  }
-  
-  @property()
-  public context: string|null = null;
-
-  @property()
-  public modelContext: string|null = null;
-
   protected handleStateUpdate (state: any) {
     const prevModelValue = this.modelValue;
-    const context = this.modelContext ? this.modelContextObject : state;
-    this.modelValue = get(context, this.model||'', null);
+    this.modelValue = get(state, this.model||'', null);
     if (!isEqual(this.modelValue, prevModelValue)) {
       this.performUpdate();
     }
