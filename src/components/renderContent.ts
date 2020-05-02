@@ -1,11 +1,8 @@
-import format from 'string-template';
-import isNil from 'lodash/isNil';
 import mapValues from 'lodash/mapValues';
+import get from 'lodash/get';
 
-const templatePattern = new RegExp(/\{\s?([0-9a-zA-Z]+)\s?\}/g);
+const templatePattern = new RegExp(/\{\s?([0-9a-zA-Z\.]+)\s?\}/g);
 
-// TODO: write own rendering replacement to have better control
-// currently array properties are not replaced (e.g. Array.length)
 export const jsonStringifyForHTML = (item: any) => typeof item === 'object' ? JSON.stringify(item).replace(/"/g, "'") : item; 
 
 interface MatchRange { 
@@ -16,9 +13,11 @@ interface MatchRange {
 const replaceMatches = (charList: string[], matchRanges: MatchRange[], data: any): string => {
   let skipIndex: number = 0;
   const newCharList = matchRanges.reduce((acc, { range, propName }) => {
+    const raw = get(data, propName)
+    const value = raw !== null && typeof raw === 'object' ? jsonStringifyForHTML(raw) : raw;
     const newAcc = [
       ...acc.slice(0, range[0] + skipIndex),
-      data[propName],
+      value,
       ...acc.slice(range[1] + skipIndex)
     ];
     skipIndex += 1 - (range[1] - range[0]);
@@ -41,10 +40,7 @@ export const renderContent = (template: string) => {
 
   return (item: any): string => {
     const json = jsonStringifyForHTML(item);
-    const props = mapValues(item, (value) => {
-      return value !== null && typeof value === 'object' ? jsonStringifyForHTML(value) : value;
-    })
-    let data: any = { ...props, 'this': json };
+    let data: any = { ...item, 'this': json };
     return replaceMatches(charList, matchRanges, data);
   }
 }
