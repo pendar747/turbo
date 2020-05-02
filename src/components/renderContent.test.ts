@@ -53,4 +53,16 @@ describe('render content', () => {
     const output = renderContent(template)({ name: 'Pete', friends: ['Alex', 'Dave'] });
     expect(output).toBe('My name is Pete and I have 2 friends.');
   });
+  
+  it('should print an item of an array', () => {
+    const template = 'My name is {name} and {friends[0]} is my best mate.';
+    const output = renderContent(template)({ name: 'James', friends: ['Alex', 'Dave'] });
+    expect(output).toBe('My name is James and Alex is my best mate.');
+  });
+  
+  it('should print an nested properties', () => {
+    const template = 'My name is {name} and {friends[0].lastName} is my best mate.';
+    const output = renderContent(template)({ name: 'James', friends: [{ lastName: 'Barkinsov', firstname: 'Sash' }, 'Dave'] });
+    expect(output).toBe('My name is James and Barkinsov is my best mate.');
+  });
 });

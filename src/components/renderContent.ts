@@ -1,7 +1,7 @@
 import mapValues from 'lodash/mapValues';
 import get from 'lodash/get';
 
-const templatePattern = new RegExp(/\{\s?([0-9a-zA-Z\.]+)\s?\}/g);
+const templatePattern = new RegExp(/\{\s?([0-9a-zA-Z\.\[\]]+)\s?\}/g);
 
 export const jsonStringifyForHTML = (item: any) => typeof item === 'object' ? JSON.stringify(item).replace(/"/g, "'") : item; 
 
