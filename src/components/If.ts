@@ -9,7 +9,6 @@ export default class If extends TurboComponent {
   }
 
   render () {
-    console.log('if', this.condition);
     return this.condition ? html`<slot></slot>`: html``; 
   }
 }
