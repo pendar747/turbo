@@ -1,7 +1,6 @@
 import { renderContent } from "./renderContent";
 
 describe('render content', () => {
-
   it('should render content with templates', () => {
     const template = 'My name is {name} and I live in {city} and I love {food}.';
     const output = renderContent(template)({ name: 'John', city: 'London', food: 'pancakes' });

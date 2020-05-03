@@ -1,13 +1,13 @@
-import pkg from './package.json';
-import typescriptPlugin from 'rollup-plugin-typescript2';
-import jsonPlugin from '@rollup/plugin-json';
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import { string } from 'rollup-plugin-string';
-import css from 'rollup-plugin-css-only';
-import visualizer from 'rollup-plugin-visualizer';
+const pkg = require('./package.json');
+const typescriptPlugin = require('rollup-plugin-typescript2');
+const jsonPlugin = require('@rollup/plugin-json');
+const resolve = require('@rollup/plugin-node-resolve');
+const commonjs = require('@rollup/plugin-commonjs');
+const { string } = require('rollup-plugin-string');
+const css = require('rollup-plugin-css-only');
+const visualizer = require('rollup-plugin-visualizer');
 
-export default [
+module.exports = [
   {
     input: 'src/index.ts',
     plugins: [

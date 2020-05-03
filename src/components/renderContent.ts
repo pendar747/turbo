@@ -1,4 +1,3 @@
-import mapValues from 'lodash/mapValues';
 import get from 'lodash/get';
 
 const templatePattern = new RegExp(/\{\s?([0-9a-zA-Z\.\[\]]+)\s?\}/g);
