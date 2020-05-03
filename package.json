@@ -1,5 +1,5 @@
 {
-  "name": "turbo-core",
+  "name": "turbo",
   "version": "0.0.1",
   "main": "public/dist/index.common.js",
   "module": "public/dist/index.js",
