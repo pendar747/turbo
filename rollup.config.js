@@ -24,7 +24,7 @@ module.exports = [
       typescriptPlugin(),
       jsonPlugin(),
       css({
-        output: 'public/dist/default-theme.css',
+        output: 'dist/default-theme.css',
         include: 'src/styles/**/*.css'
       }),
       string({
