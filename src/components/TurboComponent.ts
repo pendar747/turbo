@@ -63,7 +63,7 @@ export default abstract class TurboComponent extends LitElement {
         }
         // watch for state updates
         on(`${stateName}-state-update`, (event) => {
-          this.handleStateUpdate(event.detail.state);
+          this.handleStateUpdate(event.detail);
         });
       }
     }

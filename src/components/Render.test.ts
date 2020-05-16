@@ -59,7 +59,7 @@ describe('Render', () => {
     const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
 
     expect(el.shadowRoot?.textContent).toEqual('My name is Mike and I live in New York.');
-    fire('main-state-update', { state: { profile: { name: 'Mike', city: 'Tokyo' } } });
+    fire('main-state-update', { profile: { name: 'Mike', city: 'Tokyo' } });
     expect(el.shadowRoot?.textContent).toEqual('My name is Mike and I live in Tokyo.');
   });
 
@@ -90,7 +90,7 @@ describe('Render', () => {
       .toEqual('My name is Raj and I live in Bangalore.');
   });
 
-  it('should update the rendered list when the model updates', async () => {
+  it('should update the rendered list when an item in the list is updated', async () => {
     const state = {
       profiles: [{
         name: 'Mike',
@@ -112,21 +112,101 @@ describe('Render', () => {
       .toEqual('My name is Jimmy and I live in Boston.');
 
     fire('list-state-update', {
-      state: {
-        profiles: [{
-          name: 'Mike',
-          city: 'New York'
-        }, {
-          name: 'Bumpzy',
-          city: 'Greenwich'
-        }, {
-          name: 'Raj',
-          city: 'Bangalore'
-        }]
-      }
+      profiles: [{
+        name: 'Mike',
+        city: 'New York'
+      }, {
+        name: 'Bumpzy',
+        city: 'Greenwich'
+      }, {
+        name: 'Raj',
+        city: 'Bangalore'
+      }]
     });
     
     expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
       .toEqual('My name is Bumpzy and I live in Greenwich.');
+  });
+  
+  it('should update the rendered list when an item removed', async () => {
+    const state = {
+      profiles: [{
+        name: 'Mike',
+        city: 'New York'
+      }, {
+        name: 'Jimmy',
+        city: 'Boston'
+      }, {
+        name: 'Raj',
+        city: 'Bangalore'
+      }]
+    };
+    localStorage.setItem('list', JSON.stringify(state));
+    await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
+    const parent = await fixture(`<div state="list"></div>`);
+    const el = await fixture(`<tb-render template="my-template" model="profiles"></tb-render>`, { parentNode: parent });
+
+    expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(3);
+    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
+      .toEqual('My name is Jimmy and I live in Boston.');
+
+    fire('list-state-update', {
+      profiles: [{
+        name: 'Mike',
+        city: 'New York'
+      }, {
+        name: 'Raj',
+        city: 'Bangalore'
+      }]
+    });
+    
+    expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(2);
+    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
+      .toEqual('My name is Raj and I live in Bangalore.');
+  });
+  
+  it('should update the rendered list when an item added', async () => {
+    const state = {
+      profiles: [{
+        name: 'Mike',
+        city: 'New York'
+      }, {
+        name: 'Jimmy',
+        city: 'Boston'
+      }, {
+        name: 'Raj',
+        city: 'Bangalore'
+      }]
+    };
+    localStorage.setItem('list', JSON.stringify(state));
+    await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
+    const parent = await fixture(`<div state="list"></div>`);
+    const el = await fixture(`<tb-render template="my-template" model="profiles"></tb-render>`, { parentNode: parent });
+
+    expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(3);
+    expect(el.shadowRoot?.querySelector('tb-render:last-of-type')?.shadowRoot?.textContent)
+      .toEqual('My name is Raj and I live in Bangalore.');
+
+    const newState = {
+      profiles: [{
+        name: 'Mike',
+        city: 'New York'
+      }, {
+        name: 'Jimmy',
+        city: 'Boston'
+      }, {
+        name: 'Raj',
+        city: 'Bangalore'
+      }, {
+        name: 'Emanuel',
+        city: 'Vienna'
+      }]
+    };
+    localStorage.setItem('list', JSON.stringify(newState));
+    fire('list-state-update', newState);
+    
+    expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(4);
+    expect(el.shadowRoot?.querySelector('tb-render:last-of-type')?.shadowRoot?.textContent)
+      .toEqual('My name is Emanuel and I live in Vienna.');
   });
 });
