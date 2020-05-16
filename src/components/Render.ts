@@ -26,10 +26,10 @@ export default class Render extends TurboComponent {
   renderElements () {
     return this.modelValue.map((valueItem: any, index: number) => {
       if (this.model) {
-        return html`<tb-render model="${this.model}[${index}]" template="${this.template}"><tb-template>`
+        return html`<tb-render model="${this.model}[${index}]" template="${this.template}"></tb-render>`
       }
       if (this.value) {
-        return html`<tb-render value="${jsonStringifyForHTML(valueItem)}" template="${this.template}"><tb-template>`
+        return html`<tb-render value="${jsonStringifyForHTML(valueItem)}" template="${this.template}"></tb-render>`
       }
     })
   }

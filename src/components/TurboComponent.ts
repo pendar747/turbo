@@ -52,6 +52,16 @@ export default abstract class TurboComponent extends LitElement {
       const stateName = this.getStateName();
       
       if (stateName) {
+        // get the initial state from local storage
+        const storedState = localStorage.getItem(stateName);
+        if(storedState) {
+          try {
+            this.handleStateUpdate(JSON.parse(storedState));
+          } catch (error) {
+            console.error(error);            
+          }
+        }
+        // watch for state updates
         on(`${stateName}-state-update`, (event) => {
           this.handleStateUpdate(event.detail.state);
         });
