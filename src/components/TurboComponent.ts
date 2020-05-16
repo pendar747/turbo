@@ -1,10 +1,7 @@
 import { LitElement, property } from "lit-element";
 import { on } from "../util";
 import { get, isEqual } from "lodash";
-import getState from "./getState";
 
-// TODO: make value implicitly get the raw value if surrounded by {}
-// otherwise get the model value
 export default abstract class TurboComponent extends LitElement {
   
   @property()
@@ -55,7 +52,6 @@ export default abstract class TurboComponent extends LitElement {
       const stateName = this.getStateName();
       
       if (stateName) {
-        this.handleStateUpdate(getState(stateName));
         on(`${stateName}-state-update`, (event) => {
           this.handleStateUpdate(event.detail.state);
         });
