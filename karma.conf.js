@@ -1,15 +1,5 @@
 // Karma configuration
 // Generated on Sun May 03 2020 00:02:43 GMT+0100 (British Summer Time)
-const omit = require('lodash/omit');
-
-const rollupConfig = {
-  ...omit(require('./rollup.config')[0], 'input'),
-  output: {
-      format: 'iife', // Helps prevent naming collisions.
-      name: 'turbo', // Required for 'iife' format.
-      sourcemap: 'inline', // Sensible for testing.
-  }
-}
 
 module.exports = function(config) {
   config.set({
@@ -17,15 +7,26 @@ module.exports = function(config) {
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
-
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine', 'esm'],
 
+    plugins: [
+      // load plugin
+      require.resolve('@open-wc/karma-esm'),
+  
+      // fallback: resolve any karma- plugins
+      'karma-*',
+    ],
+
+    esm: {
+      // if you are using 'bare module imports' you will need this option
+      nodeResolve: true,
+    },
 
     // list of files / patterns to load in the browser
     files: [
-      { pattern: "src/**/*.test.ts", watched: false }
+      { pattern: "dist/**/*.test.js", watched: false, type: "module" }
     ],
 
 
@@ -33,29 +34,10 @@ module.exports = function(config) {
     exclude: [
     ],
 
-
-    // preprocess matching files before serving them to the browser
-    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
-      "src/**/*.ts": ["rollup"]
-    },
-
-
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: ["progress"],
-
-    // karmaTypescriptConfig: {
-    //   bundlerOptions: {
-    //       transforms: [
-    //           require("karma-typescript-es6-transform")()
-    //       ]
-    //   },
-    //   compilerOptions
-    // },
-    rollupPreprocessor: rollupConfig,
-
 
     // web server port
     port: 9876,

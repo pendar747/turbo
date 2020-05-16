@@ -1,8 +1,17 @@
-import get from 'lodash/get';
+import get from 'lodash-es/get';
+import isNil from 'lodash-es/isNil';
 
 const templatePattern = new RegExp(/\{\s?([0-9a-zA-Z\.\[\]]+)\s?\}/g);
 
 export const jsonStringifyForHTML = (item: any) => typeof item === 'object' ? JSON.stringify(item).replace(/"/g, "'") : item; 
+
+export const jsonParseFromHtml = (value?: string|null) => {
+  if (isNil(value)) {
+    return false;
+  }
+  const valueJSON = value.replace(/'/g, '"');
+  return JSON.parse(valueJSON);
+}
 
 interface MatchRange { 
   propName: string, 

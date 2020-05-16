@@ -1,6 +1,8 @@
 import { LitElement, property } from "lit-element";
 import { on } from "../util";
-import { get, isEqual } from "lodash";
+import { jsonParseFromHtml } from "./renderContent";
+import get from 'lodash-es/get';
+import isEqual from 'lodash-es/isEqual';
 
 export default abstract class TurboComponent extends LitElement {
   
@@ -25,10 +27,9 @@ export default abstract class TurboComponent extends LitElement {
       return;
     }
     try {
-      const valueJSON = this.value?.replace(/'/g, '"');
-      this.modelValue = JSON.parse(valueJSON);
+      this.modelValue = jsonParseFromHtml(this.value);
     } catch (error) {
-      // console.error('failed to parse value for', this);
+      console.error('failed to parse value for', this);
     }
   }
 
