@@ -50,18 +50,21 @@ export default class Page extends LitElement {
     }
   }
 
-  onPageChange = async () => {
-    this.pagePath = location.pathname;
-    if (!this.templateElement) {
-      await this.fetchHtml();
+  private onPageChange = async () => {
+    if (this.isConnected) {
+      this.pagePath = location.pathname;
+      if (!this.templateElement) {
+        await this.fetchHtml();
+      }
+      this.requestUpdate();
     }
-    this.requestUpdate();
   }
 
   disconnectedCallback () {
-    window.removeEventListener('popstate', this.onPageChange);    
-    document.removeEventListener('page-change', this.onPageChange);
+    // TODO: fix removeEventListener to work properly
     super.disconnectedCallback();
+    window.removeEventListener('popstate', this.onPageChange);
+    document.removeEventListener('page-change', this.onPageChange);
   }
 
   connectedCallback () {

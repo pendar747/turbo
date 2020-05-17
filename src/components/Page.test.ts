@@ -4,8 +4,9 @@ import { fire } from "../util";
 
 describe('Page', () => {
 
-  afterEach(() => {
-    document.querySelector('tb-page')?.remove();
+  beforeEach(() => {
+    document.querySelectorAll('template').forEach(el => el.remove());
+    document.querySelectorAll('tb-page').forEach(el => el.remove());
   });
 
   it('should render the content of the template with the same id as the page path', async () => {
@@ -16,7 +17,7 @@ describe('Page', () => {
       </template>
     `);
     history.pushState({ page: 'page-2' }, 'Page 2', '/page-2');
-    const el = await fixture('<tb-page></tb-page>');
+    const el = await fixture('<tb-page id="1"></tb-page>');
 
     expect(el.shadowRoot?.textContent).toContain('Page 2');
     expect(el.shadowRoot?.textContent).toContain('content');
@@ -36,7 +37,7 @@ describe('Page', () => {
     `);
 
     history.pushState({ page: 'page-2' }, 'Page 2', '/page-2');
-    const el = await fixture('<tb-page></tb-page>');
+    const el = await fixture('<tb-page id="2"></tb-page>');
     
     expect(el.shadowRoot?.textContent).toContain('Page 2');
     expect(el.shadowRoot?.textContent).toContain('content');
@@ -63,7 +64,7 @@ describe('Page', () => {
     `);
 
     history.pushState({ page: 'page-2' }, 'Page 2', '/page-2');
-    const el = await fixture('<tb-page></tb-page>');
+    const el = await fixture('<tb-page id="3"></tb-page>');
     
     expect(el.shadowRoot?.textContent).toContain('Page 2');
     expect(el.shadowRoot?.textContent).toContain('content');
@@ -85,7 +86,7 @@ describe('Page', () => {
     `);
 
     history.pushState({ page: 'page-3' }, 'Page 3', '/page-2/2/page-3');
-    const el = await fixture('<tb-page></tb-page>');
+    const el = await fixture('<tb-page id="5"></tb-page>');
     
     expect(el.shadowRoot?.textContent).toContain('Page 3');
     expect(el.shadowRoot?.textContent).toContain('Content of page 3');
@@ -105,7 +106,7 @@ describe('Page', () => {
     `);
 
     history.pushState({ page: 'page-3' }, 'Page 3', '/page-2/2/page-3');
-    const el = await fixture('<tb-page></tb-page>');
+    const el = await fixture('<tb-page id="6"></tb-page>');
     
     expect(el.shadowRoot?.textContent).toContain('Page 3');
     expect(el.shadowRoot?.textContent).toContain('Content of page 3');
@@ -140,7 +141,7 @@ describe('Page', () => {
     }]));
     
     history.pushState({ page: '/page-6/2/page-3' }, 'My Page', '/page-6/2/page-3');
-    const el = await fixture('<tb-page></tb-page>');
+    const el = await fixture('<tb-page id="7"></tb-page>');
     
     await elementUpdated(el);
     expect(el.shadowRoot?.textContent).toContain('Page 3');
@@ -183,7 +184,7 @@ describe('Page', () => {
     }]));
 
     history.pushState({ page: '/page-6/2/page-3' }, 'My Page', '/page-6/2/page-3');
-    const el = await fixture('<tb-page></tb-page>');
+    const el = await fixture('<tb-page id="2"></tb-page>');
     
     await elementUpdated(el);
     expect(el.shadowRoot?.textContent).toContain('Page 3');
@@ -198,5 +199,49 @@ describe('Page', () => {
     expect(el.shadowRoot?.textContent).toContain('Content of awesome page');
     
     window.fetch = originalFetch;
+  });
+  
+  it('should only call the api when the template is missing', async () => {
+    const fetchSpy = spyOn(window, 'fetch').and.resolveTo({
+      async text () {
+        return `
+          <template page-path="/page-6/:id/page-3">
+            <h1>Page 3</h1>
+            <p>Content of page 3</p>
+          </template>
+        `
+      }
+    } as any);
+
+    localStorage.setItem('page-url-maps', JSON.stringify([{
+      pattern: '/page-6/:id/page-3',
+      page: '/page-6/page-3.html'
+    }, {
+      pattern: '/page-6/:id/page-2',
+      page: '/page-6/page-2.html'
+    }]));
+
+    history.pushState({ page: '/page-6/2/page-3' }, 'My Page', '/page-6/2/page-3');
+    const el = await fixture('<tb-page id="1"></tb-page>');
+
+    await elementUpdated(el);
+
+    expect(fetchSpy.calls.count()).toEqual(1);
+    expect(fetchSpy.calls.mostRecent().args).toEqual(['/page-6/page-3.html']);
+
+    history.pushState({ page: '/page-6/2/page-2' }, 'Page 2', '/page-6/2/page-2');
+    fire('page-change');
+    
+    await elementUpdated(el);
+    await elementUpdated(el);
+        
+    history.pushState({ page: '/page-6/2/page-3' }, 'My Page', '/page-6/2/page-3');
+    fire('page-change');
+    
+    await elementUpdated(el);
+    await elementUpdated(el);
+    
+    expect(fetchSpy.calls.count()).toEqual(2);
+    expect(fetchSpy.calls.mostRecent().args).toEqual(['/page-6/page-2.html']);
   });
 });
