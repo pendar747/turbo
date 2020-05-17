@@ -113,4 +113,36 @@ describe('Page', () => {
     expect(el.shadowRoot?.textContent).toContain('Page 4');
     expect(el.shadowRoot?.textContent).toContain('Content of page 4');
   });
+
+  it('should make a request to get the page template (using a pageUrlMap stored in ' + 
+  'local storage) from a file when template is not found', async () => {
+    // todo mock ajax call
+    const originalFetch = window.fetch;
+    window.fetch = async (): Promise<any> => {
+      return {
+        async text () {
+          return `
+            <template page-path="/page-6/:id/page-3">
+              <h1>Page 3</h1>
+              <p>Content of page 3</p>
+            </template>
+          `
+        }
+      }
+    }
+
+    localStorage.setItem('page-url-maps', JSON.stringify([{
+      pattern: '/page-6/:id/page-3',
+      page: '/page-6/page-3.html'
+    }]));
+    
+    history.pushState({ page: '/page-6/2/page-3' }, 'My Page', '/page-6/2/page-3');
+    const el = await fixture('<tb-page></tb-page>');
+    
+    await elementUpdated(el);
+    expect(el.shadowRoot?.textContent).toContain('Page 3');
+    expect(el.shadowRoot?.textContent).toContain('Content of page 3');
+    
+    window.fetch = originalFetch;
+  });
 });
