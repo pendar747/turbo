@@ -4,6 +4,10 @@ import { fire } from "../util";
 
 describe('Page', () => {
 
+  afterEach(() => {
+    document.querySelector('tb-page')?.remove();
+  });
+
   it('should render the content of the template with the same id as the page path', async () => {
     await fixture(`
       <template page-path="/page-2">
@@ -116,7 +120,6 @@ describe('Page', () => {
 
   it('should make a request to get the page template (using a pageUrlMap stored in ' + 
   'local storage) from a file when template is not found', async () => {
-    // todo mock ajax call
     const originalFetch = window.fetch;
     window.fetch = async (): Promise<any> => {
       return {
@@ -142,6 +145,57 @@ describe('Page', () => {
     await elementUpdated(el);
     expect(el.shadowRoot?.textContent).toContain('Page 3');
     expect(el.shadowRoot?.textContent).toContain('Content of page 3');
+    
+    window.fetch = originalFetch;
+  });
+
+  it('should fetch the html page when the page path changes', async () => {
+    const originalFetch = window.fetch;
+    window.fetch = async (url: any): Promise<any> => {
+      return {
+        async text () {
+          if (url === '/page-6/page-3.html') {
+            return `
+              <template page-path="/page-6/:id/page-3">
+                <h1>Page 3</h1>
+                <p>Content of page 3</p>
+              </template>
+            `
+          }
+          if (url === '/page-6/page-2.html') {
+            return `
+              <template page-path="/page-6/:id/page-2">
+                <h1>Awesome page</h1>
+                <p>Content of awesome page</p>
+              </template>
+            `
+          }
+        }
+      }
+    }
+
+    localStorage.setItem('page-url-maps', JSON.stringify([{
+      pattern: '/page-6/:id/page-3',
+      page: '/page-6/page-3.html'
+    }, {
+      pattern: '/page-6/:id/page-2',
+      page: '/page-6/page-2.html'
+    }]));
+
+    history.pushState({ page: '/page-6/2/page-3' }, 'My Page', '/page-6/2/page-3');
+    const el = await fixture('<tb-page></tb-page>');
+    
+    await elementUpdated(el);
+    expect(el.shadowRoot?.textContent).toContain('Page 3');
+    expect(el.shadowRoot?.textContent).toContain('Content of page 3');
+
+    history.pushState({ page: 'awesome page' }, 'awesome page', '/page-6/2/page-2');
+    fire('page-change');
+    
+    await elementUpdated(el);
+    await elementUpdated(el);
+    expect(el.shadowRoot?.textContent).toContain('Awesome page');
+    expect(el.shadowRoot?.textContent).toContain('Content of awesome page');
     
     window.fetch = originalFetch;
   });
