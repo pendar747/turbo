@@ -16,26 +16,39 @@ const getEventDescriptions = (attributeValue: string): EventDesc[] => {
     .filter(x => x !== undefined) as EventDesc[];
 }
 
-const registeredElements = new Map<Element, Map<string, string>>();
+const registeredElements = new Map<Element, Map<string, { domEvent: string, handler: () => any }>>();
+
+const applyDescs = ({ el, eventDescs }: { el: Element, eventDescs: EventDesc[] }) => {
+  // TODO: find the event descs that are not in attributes and remove their listener
+  eventDescs.forEach((desc) => {
+    const { domEvent, userEvent } = desc;
+    const handler = () => fire(userEvent);
+    if (registeredElements.has(el)) {
+      if (registeredElements.get(el)?.get(userEvent)?.domEvent !== domEvent) {
+        console.log('applying', desc);
+        el.addEventListener(domEvent, handler);
+        registeredElements.get(el)?.set(userEvent, { domEvent, handler });
+      }
+    } else {
+      console.log('applying', desc);
+      el.addEventListener(domEvent, handler);
+      registeredElements.set(el, new Map([[userEvent, { domEvent, handler }]]));
+    }
+  });
+}
 
 const applyActions = () => {
   const elements = Array.from(document.querySelectorAll('[tb-action]'));
-  elements.forEach((el) => {
+
+  const eventDescsForAll: { el: Element, eventDescs: EventDesc[] }[] = elements.map((el) => {
     const action = el.getAttribute('tb-action');
-    const eventDescs = getEventDescriptions(action ?? '');
-    eventDescs.forEach((desc) => {
-      const { domEvent, userEvent } = desc;
-      if (registeredElements.has(el)) {
-        if (registeredElements.get(el)?.get(userEvent) !== domEvent) {
-          el.addEventListener(domEvent, () => fire(userEvent));
-          registeredElements.get(el)?.set(userEvent, domEvent);
-        }
-      } else {
-        el.addEventListener(domEvent, () => fire(userEvent));
-        registeredElements.set(el, new Map([[userEvent, domEvent]]));
-      }
-    });
+    return {
+      eventDescs: getEventDescriptions(action ?? ''),
+      el
+    }
   });
+
+  eventDescsForAll.forEach(applyDescs);
 }
 
 const observeActions = (targetNode: Node): MutationObserver => {
