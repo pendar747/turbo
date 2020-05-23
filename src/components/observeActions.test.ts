@@ -1,4 +1,4 @@
-import { fixture } from "@open-wc/testing-helpers";
+import { fixture, elementUpdated } from "@open-wc/testing-helpers";
 import { on } from "../util";
 import observeActions from './observeActions';
 
@@ -37,6 +37,7 @@ describe('tb-action attribute', () => {
     on('my-other-event', myOtherEventCallback);
     const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event-3">click</button>`);
     el.setAttribute('tb-action', 'click:my-other-event');
+    await elementUpdated(el);
     el.dispatchEvent(new MouseEvent('click'));
 
     expect(myEventCallback.calls.count()).toEqual(0);
