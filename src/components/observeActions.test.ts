@@ -43,4 +43,48 @@ describe('tb-action attribute', () => {
     expect(myEventCallback.calls.count()).toEqual(0);
     expect(myOtherEventCallback.calls.count()).toEqual(1);
   });
+  
+  it('should fire an extra event when an action attribute is added', async () => {
+    const myEventCallback = jasmine.createSpy();
+    const myOtherEventCallback = jasmine.createSpy();
+    on('my-event-3', myEventCallback);
+    on('my-other-event', myOtherEventCallback);
+    const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event-3">click</button>`);
+    el.setAttribute('tb-action', 'click:my-other-event;click:my-event-3');
+    await elementUpdated(el);
+    el.dispatchEvent(new MouseEvent('click'));
+
+    expect(myEventCallback.calls.count()).toEqual(1);
+    expect(myOtherEventCallback.calls.count()).toEqual(1);
+  });
+  
+  it('should only fire the event once if registered twice', async () => {
+    const myEventCallback = jasmine.createSpy();
+    on('my-event-3', myEventCallback);
+    const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event-3;click:my-event-3">click</button>`);
+    el.dispatchEvent(new MouseEvent('click'));
+
+    expect(myEventCallback.calls.count()).toEqual(1);
+  });
+  
+  it('should not fire the event when attribute is removed', async () => {
+    const myEventCallback = jasmine.createSpy();
+    on('my-event-3', myEventCallback);
+    const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event-3">click</button>`);
+    el.removeAttribute('tb-action');
+    await elementUpdated(el);
+    el.dispatchEvent(new MouseEvent('click'));
+
+    expect(myEventCallback.calls.count()).toEqual(0);
+  });
+  
+  it('should fire the same user event for each dom event that it is assigned to', async () => {
+    const myEventCallback = jasmine.createSpy();
+    on('my-event-3', myEventCallback);
+    const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event-3;mouseover:my-event-3">click</button>`);
+    el.dispatchEvent(new MouseEvent('click'));
+    el.dispatchEvent(new MouseEvent('mouseover'));
+
+    expect(myEventCallback.calls.count()).toEqual(2);
+  });
 });

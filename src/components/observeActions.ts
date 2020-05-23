@@ -1,5 +1,5 @@
 import { fire } from "../util";
-import isEqual from 'lodash-es/isEqual';
+import uniq from 'lodash-es/uniq';
 
 interface EventDesc {
   domEvent: string, 
@@ -31,6 +31,7 @@ const applyDescs = ({ el, eventDescs }: { el: Element, eventDescs: EventDesc[] }
       if (registeredElements.get(el)?.get(userEvent)?.domEvent !== domEvent) { 
         el.addEventListener(domEvent, handler);
         registeredElements.get(el)?.set(userEvent, { domEvent, handler });
+        // console.log('apply', { userEvent, domEvent });
       }
     // if the element is not registered at all then apply this event description
     } else {
@@ -53,12 +54,15 @@ const removeUnassignedDescs = ({ el, eventDescs }: { el: Element, eventDescs: Ev
     });
   unassignedHandlers.forEach(([userEvent, { domEvent, handler }]) => {
     el.removeEventListener(domEvent, handler);
-    registeredElements.get(el)?.delete(domEvent);
+    registeredElements.get(el)?.delete(userEvent);
   });
 }
 
-const applyActions = () => {
-  const elements = Array.from(document.querySelectorAll('[tb-action]'));
+const applyActions = (addedElements: Element[]) => {
+  const elements = uniq([
+    ...addedElements,
+    ...registeredElements.keys()
+  ]);
 
   const eventDescsForAll: { el: Element, eventDescs: EventDesc[] }[] = elements.map((el) => {
     const action = el.getAttribute('tb-action');
@@ -77,10 +81,12 @@ const observeActions = (targetNode: Node): MutationObserver => {
 
   const observer = new MutationObserver((mutationsList, observer) => {
     for (let mutation of mutationsList) {
-      if (mutation.type === 'childList') {
-        applyActions();
+      const elements: Element[] = Array.from(mutation.addedNodes)
+        .filter(el => el.nodeType == Node.ELEMENT_NODE && (el as Element).hasAttribute('tb-action')) as Element[];
+      if (mutation.type === 'childList' && elements.length > 0) {
+        applyActions(elements);
       } else if (mutation.type === 'attributes' && mutation.attributeName === 'tb-action') {
-        applyActions();
+        applyActions(elements);
       }
     }
   });
