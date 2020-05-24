@@ -17,13 +17,14 @@ const getEventDescriptions = (attributeValue: string): EventDesc[] => {
     .filter(x => x !== undefined) as EventDesc[];
 }
 
-const registeredElements = new Map<Element, Map<string, { domEvent: string, handler: () => any }>>();
+const registeredElements = new Map<Element, Map<string, { domEvent: string, handler: (e: Event) => any }>>();
 
-const applyDescs = ({ el, eventDescs }: { el: Element, eventDescs: EventDesc[] }) => {
+const applyDescs = ({ el, eventDescs, data }: { el: Element, eventDescs: EventDesc[], data: any }) => {
   eventDescs.forEach((desc) => {
     const { domEvent, userEvent } = desc;
-    const handler = () => {
-      fire(userEvent);
+    const handler = (e: Event) => {
+      const elementData = (e.target as HTMLElement).dataset ?? {};
+      fire(userEvent, { ...data, ...elementData });
     }
     if (registeredElements.has(el)) { // if element is already registered
       // if element has the given user event registered but it's assigned to a different dom event
@@ -58,17 +59,18 @@ const removeUnassignedDescs = ({ el, eventDescs }: { el: Element, eventDescs: Ev
   });
 }
 
-const applyActions = (addedElements: Element[]) => {
+const applyActions = (addedElements: Element[], data: any) => {
   const elements = uniq([
     ...addedElements,
     ...registeredElements.keys()
   ]);
 
-  const eventDescsForAll: { el: Element, eventDescs: EventDesc[] }[] = elements.map((el) => {
+  const eventDescsForAll: { el: Element, eventDescs: EventDesc[], data: any }[] = elements.map((el) => {
     const action = el.getAttribute('tb-action');
     return {
       eventDescs: getEventDescriptions(action ?? ''),
-      el
+      el,
+      data
     }
   });
 
@@ -76,7 +78,7 @@ const applyActions = (addedElements: Element[]) => {
   eventDescsForAll.forEach(applyDescs);
 }
 
-const observeActions = (targetNode: Node): MutationObserver => {
+const observeActions = (targetNode: Node, data: any = null): MutationObserver => {
   const config = { attributes: true, childList: true, subtree: true };
 
   const observer = new MutationObserver((mutationsList, observer) => {
@@ -84,9 +86,9 @@ const observeActions = (targetNode: Node): MutationObserver => {
       const elements: Element[] = Array.from(mutation.addedNodes)
         .filter(el => el.nodeType == Node.ELEMENT_NODE && (el as Element).hasAttribute('tb-action')) as Element[];
       if (mutation.type === 'childList' && elements.length > 0) {
-        applyActions(elements);
+        applyActions(elements, data);
       } else if (mutation.type === 'attributes' && mutation.attributeName === 'tb-action') {
-        applyActions(elements);
+        applyActions(elements, data);
       }
     }
   });
