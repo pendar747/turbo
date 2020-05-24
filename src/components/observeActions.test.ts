@@ -174,4 +174,18 @@ describe('tb-action attribute', () => {
     expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({ model: 'my-model', latency: '3ms' });
     expect(mouseOverCallback.calls.argsFor(0)[0].detail).toEqual({ model: 'my-model', latency: '3ms' });
   });
+  
+  it('should also include value of the target element in event data', async () => {
+    observer.disconnect();
+    observer = observeActions(document.body, { model: 'my-model' });
+    
+    const myEventCallback = jasmine.createSpy();
+    on('my-event-3', myEventCallback);
+    const el: HTMLButtonElement = await fixture(`<input value="Pete" tb-action="keyup:my-event-3">`);
+    el.dispatchEvent(new KeyboardEvent('keyup'));
+
+    expect(myEventCallback.calls.count()).toEqual(1);
+    expect(myEventCallback.calls.argsFor(0)[0]).toBeInstanceOf(CustomEvent);
+    expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({ model: 'my-model', value: 'Pete' });
+  });
 });

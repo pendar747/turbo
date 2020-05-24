@@ -1,4 +1,4 @@
-import { fixture } from '@open-wc/testing-helpers';
+import { fixture, elementUpdated } from '@open-wc/testing-helpers';
 import './Render';
 import { fire, on } from '../util';
 
@@ -240,5 +240,28 @@ describe('Render', () => {
     expect(myEventCallback.calls.count()).toEqual(1);
     expect(myEventCallback.calls.argsFor(0)[0]).toBeInstanceOf(CustomEvent);
     expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({ model: 'profile', name: 'Mike' });
+  });
+  
+  it('should update the model and render with the fired event', async () => {
+    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+    await fixture('<template id="my-template"><span>{name}</span><input tb-action="keyup:setName" id="my-input" /></template>')
+    const parent = await fixture(`<div state="main"></div>`);
+    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+    on('setName', (event) => {
+      const newState = {
+        profile: {
+          name: event.detail.value,
+          city: 'New York'
+        }
+      }
+      localStorage.setItem('list', JSON.stringify(newState));
+      fire('main-state-update', newState);
+    });
+    (el.shadowRoot?.getElementById('my-input') as HTMLInputElement).value = 'David';
+    el.shadowRoot?.getElementById('my-input')?.dispatchEvent(new KeyboardEvent('keyup'));
+
+    await elementUpdated(el);
+    
+    expect(el.shadowRoot?.innerHTML).toEqual('<!----><div id="container"><span>David</span><input tb-action="keyup:setName" id="my-input"></div><!---->');
   });
 });

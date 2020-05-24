@@ -24,7 +24,12 @@ const applyDescs = ({ el, eventDescs, data }: { el: Element, eventDescs: EventDe
     const { domEvent, userEvent } = desc;
     const handler = (e: Event) => {
       const elementData = (e.target as HTMLElement).dataset ?? {};
-      fire(userEvent, { ...data, ...elementData });
+      const allData = { ...data, ...elementData };
+      const value = (e.target as HTMLInputElement).value;
+      if (value) {
+        allData.value = value;
+      }
+      fire(userEvent, allData);
     }
     if (registeredElements.has(el)) { // if element is already registered
       // if element has the given user event registered but it's assigned to a different dom event
