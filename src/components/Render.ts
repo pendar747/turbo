@@ -1,6 +1,7 @@
 import { customElement, html, property } from "lit-element";
 import TurboComponent from "./TurboComponent";
 import { renderContent, jsonStringifyForHTML } from "./renderContent";
+import observeActions from "./observeActions";
 
 @customElement('tb-render')
 export default class Render extends TurboComponent {
@@ -19,6 +20,8 @@ export default class Render extends TurboComponent {
   @property()
   unlessValue: string|null = null;
 
+  private observer: MutationObserver|undefined;
+
   private get templateContent () {
     return this.template ? document.getElementById(this.template)?.innerHTML || '' : '';
   }
@@ -32,6 +35,29 @@ export default class Render extends TurboComponent {
         return html`<tb-render value="${jsonStringifyForHTML(valueItem)}" template="${this.template}"></tb-render>`
       }
     })
+  }
+
+  constructor () {
+    super();
+    if (this.shadowRoot) {
+      this.observer = observeActions(this.shadowRoot, { model: this.model });
+    }
+  }
+
+  attributeChangedCallback (name: string, old: string, value: string) {
+    super.attributeChangedCallback(name, old, value);
+    if (name === 'model') {
+      this.observer?.disconnect();
+      if (this.shadowRoot) {
+        this.observer = observeActions(this.shadowRoot, { model: this.model })
+      }
+    }
+  }
+
+  disconnectedCallback () {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
   }
 
   render () {

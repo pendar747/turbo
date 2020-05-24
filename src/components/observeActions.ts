@@ -78,13 +78,13 @@ const applyActions = (addedElements: Element[], data: any) => {
   eventDescsForAll.forEach(applyDescs);
 }
 
-const observeActions = (targetNode: Node, data: any = null): MutationObserver => {
-  const config = { attributes: true, childList: true, subtree: true };
-
+const observeActions = (targetNode: Element|Document|ShadowRoot, data: any = null): MutationObserver => {
   const observer = new MutationObserver((mutationsList, observer) => {
     for (let mutation of mutationsList) {
       const elements: Element[] = Array.from(mutation.addedNodes)
-        .filter(el => el.nodeType == Node.ELEMENT_NODE && (el as Element).hasAttribute('tb-action')) as Element[];
+        .filter(el => el.nodeType == Node.ELEMENT_NODE)
+        .map(el => Array.from((el as Element).querySelectorAll('[tb-action]')))
+        .flat();
       if (mutation.type === 'childList' && elements.length > 0) {
         applyActions(elements, data);
       } else if (mutation.type === 'attributes' && mutation.attributeName === 'tb-action') {
@@ -94,7 +94,11 @@ const observeActions = (targetNode: Node, data: any = null): MutationObserver =>
   });
 
   // Start observing the target node for configured mutations
-  observer.observe(targetNode, config);
+  observer.observe(targetNode, { 
+    attributes: true, 
+    childList: true, 
+    subtree: true
+  });
 
   return observer;
 }

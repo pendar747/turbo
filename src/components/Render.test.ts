@@ -1,6 +1,6 @@
-import { fixture, waitUntil, elementUpdated } from '@open-wc/testing-helpers';
+import { fixture } from '@open-wc/testing-helpers';
 import './Render';
-import { fire } from '../util';
+import { fire, on } from '../util';
 
 describe('Render', () => {
 
@@ -208,5 +208,37 @@ describe('Render', () => {
     expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(4);
     expect(el.shadowRoot?.querySelector('tb-render:last-of-type')?.shadowRoot?.textContent)
       .toEqual('My name is Emanuel and I live in Vienna.');
+  });
+  
+  it('should fire an event for the given model', async () => {
+    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+    await fixture('<template id="my-template"><button tb-action="click:click-me" id="my-button">click me</button></template>')
+    const parent = await fixture(`<div state="main"></div>`);
+    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+
+    expect(el.shadowRoot?.innerHTML).toEqual('<!----><div id="container"><button tb-action="click:click-me" id="my-button">click me</button></div><!---->');
+
+    const myEventCallback = jasmine.createSpy();
+    on('click-me', myEventCallback);
+    el.shadowRoot?.getElementById('my-button')?.dispatchEvent(new MouseEvent('click'));
+    
+    expect(myEventCallback.calls.count()).toEqual(1);
+    expect(myEventCallback.calls.argsFor(0)[0]).toBeInstanceOf(CustomEvent);
+    expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({ model: 'profile' });
+  });
+  
+  it('should fire an event for the given model with the data that is attached to the element', async () => {
+    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+    await fixture('<template id="my-template"><button data-name="{name}" tb-action="click:click-me" id="my-button">click me</button></template>')
+    const parent = await fixture(`<div state="main"></div>`);
+    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+
+    const myEventCallback = jasmine.createSpy();
+    on('click-me', myEventCallback);
+    el.shadowRoot?.getElementById('my-button')?.dispatchEvent(new MouseEvent('click'));
+    
+    expect(myEventCallback.calls.count()).toEqual(1);
+    expect(myEventCallback.calls.argsFor(0)[0]).toBeInstanceOf(CustomEvent);
+    expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({ model: 'profile', name: 'Mike' });
   });
 });
