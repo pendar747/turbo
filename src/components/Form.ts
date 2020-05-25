@@ -6,7 +6,12 @@ import { fire } from "../util";
 class Form extends TurboComponent {
 
   @property()
-  public action: string|undefined;
+  public submitEvent: string|undefined;
+  
+  @property()
+  public changeEvent: string|undefined;
+
+  private handlersMap = new Map<Element, (event: Event) => void>();
 
   get inputElements (): HTMLInputElement[] {
     return Array.from(this.querySelectorAll('input'));
@@ -21,11 +26,32 @@ class Form extends TurboComponent {
     }, {} as any);
   }
 
+  get updateData () {
+    return { model: this.model, values: this.values };
+  }
+
   handleSubmit (event: Event) {
     event.preventDefault();
-    if (this.action) {
-      fire(this.action, { model: this.model, values: this.values });
+    if (this.submitEvent) {
+      fire(this.submitEvent, this.updateData);
     }
+  }
+
+  attributeChangedCallback (name: string, old: string, value: string) {
+    if (name == 'changeevent' && old !== value) {
+      this.inputElements.forEach((el) => {
+        const otherListener = this.handlersMap.get(el);
+        if (otherListener) {
+          el.removeEventListener('input', otherListener);
+        }
+        const handler = () => {
+          fire(value, this.updateData);
+        };
+        el.addEventListener('input', handler);
+        this.handlersMap.set(el, handler);
+      });
+    }
+    super.attributeChangedCallback(name, old, value);
   }
 
   render () {
