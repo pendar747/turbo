@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.19.2",
     "lodash-es": "^4.17.15",
+    "mobx": "^5.15.4",
     "path-to-regexp": "^6.1.0"
   },
   "devDependencies": {

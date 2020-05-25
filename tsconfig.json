@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2015",                          
     "module": "ESNext",
-    "lib": ["ES2016", "DOM", "ESNext"],
+    "lib": ["ES2016", "DOM", "ESNext", "WebWorker"],
     "declaration": true,                   
     "declarationMap": true,                
     "sourceMap": true,                     
@@ -17,7 +17,8 @@
     "resolveJsonModule": true,
     "downlevelIteration": true,
     "emitDecoratorMetadata": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   },
   "include": ["src/**/*.ts", "src/*.ts"]
 }

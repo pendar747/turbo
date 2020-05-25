@@ -27,6 +27,9 @@ export default class Render extends TurboComponent {
   }
   
   renderElements () {
+    if (!this.modelValue) {
+      return;
+    }
     return this.modelValue.map((valueItem: any, index: number) => {
       if (this.model) {
         return html`<tb-render model="${this.model}[${index}]" template="${this.template}"></tb-render>`
