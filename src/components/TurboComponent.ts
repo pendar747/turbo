@@ -12,7 +12,7 @@ export default abstract class TurboComponent extends LitElement {
   @property()
   value: string|null = null;
 
-  protected modelValue: any = null;
+  protected modelValue: { [key in string]: any }|null = null;
   
   protected handleStateUpdate (state: any) {
     const prevModelValue = this.modelValue;
