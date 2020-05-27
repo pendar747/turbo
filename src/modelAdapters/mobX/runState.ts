@@ -1,7 +1,7 @@
 import { on, fire } from "../../util";
 import { MessageData } from "./types";
 
-const runState = (src: string, stateName: string) => {
+const runState = (src: string, stateName: string): Worker => {
   const worker = new Worker(src, { type: 'module' });
   worker.onerror = (event) => {
     console.error(event.message, event.filename, event.lineno);
@@ -10,6 +10,7 @@ const runState = (src: string, stateName: string) => {
   worker.onmessage = (event) => {
     const data: MessageData = event.data;
     if (data.type == 'state-update') {
+      localStorage.setItem(stateName, JSON.stringify(data.data));
       fire('state-update', {
         stateName,
         state: data.data
@@ -27,6 +28,8 @@ const runState = (src: string, stateName: string) => {
     }
     worker.postMessage(messageData);
   });
+
+  return worker;
 }
 
 export default runState;

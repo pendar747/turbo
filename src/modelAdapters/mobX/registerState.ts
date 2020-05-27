@@ -17,11 +17,10 @@ const registerState = (stateName: string) => (StateClass: any) => {
   onmessage = (event: MessageEvent) => {
     const { actionName, data, model, stateName: messageStateName, type }: MessageData = event.data;
     if (type == 'action' && messageStateName == stateName && actionName) {
-      const actionFunction: Function = model
-        ? get(state, `${model}.${actionName}`)
-        : get(state, actionName);
+      const modelObject = model ? get(state, model) : state;
+      const actionFunction: Function = get(modelObject, actionName);
       if (actionFunction) {
-        actionFunction.call(state, data);
+        actionFunction.call(modelObject, data);
       }
     }
   }
