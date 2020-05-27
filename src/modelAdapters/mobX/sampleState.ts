@@ -21,7 +21,7 @@ export default class MainState {
   todos: Todo[] = [];
 
   @computed
-  get allTodos () {
+  get allTodosSummary () {
     return this.todos.map(({ text }) => text).join(', ');
   }
   

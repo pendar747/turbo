@@ -18,6 +18,15 @@ const runState = (src: string, stateName: string): Worker => {
     }
   }
 
+  on(`${stateName}-getters-update`, (event) => {
+    const messageData: MessageData = {
+      stateName,
+      type: 'getters-update',
+      data: event.detail
+    }
+    worker.postMessage(messageData);
+  });
+
   on('action', (event) => {
     const messageData: MessageData = {
       stateName,

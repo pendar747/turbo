@@ -92,4 +92,36 @@ describe('mobXAdapter', () => {
       }
     });
   });
+  
+  it('should expose computed properties', async () => {
+    const onStateUpdate = jasmine.createSpy();
+    fire('main-getters-update', ['todos', 'allTodosSummary']);
+    on('state-update', onStateUpdate);
+    fire('action', {
+      actionName: 'addTodo',
+      data: {
+        text: 'My todo'
+      }
+    });
+    fire('action', {
+      actionName: 'addTodo',
+      data: {
+        text: 'Another todo'
+      }
+    });
+
+    await waitUntil(() => onStateUpdate.calls.count() == 3);
+
+    expect(JSON.parse(localStorage.getItem('main') ?? '{}')).toEqual({
+      todos: [{ text: 'My todo' }, { text: 'Another todo' }],
+      allTodosSummary: 'My todo, Another todo'
+    });
+    expect(onStateUpdate.calls.argsFor(2)[0].detail).toEqual({
+      stateName: 'main',
+      state: {
+        todos: [{ text: 'My todo' }, { text: 'Another todo' }],
+        allTodosSummary: 'My todo, Another todo'
+      }
+    });
+  });
 });

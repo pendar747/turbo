@@ -3,5 +3,5 @@ export interface MessageData {
   data?: any, 
   model?: string, 
   stateName: string,
-  type: 'action'|'state-update'
+  type: 'action'|'state-update'|'getters-update'
 }
