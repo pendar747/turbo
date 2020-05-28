@@ -124,4 +124,38 @@ describe('mobXAdapter', () => {
       }
     });
   });
+  
+  it('should nested computed properties', async () => {
+    const onStateUpdate = jasmine.createSpy();
+    // TODO: find the best way to represent getters
+    // and what to do with the problem of render not knowing if something is an array or not
+    fire('main-getters-update', ['todos[0].quotedText', 'todos', 'allTodosSummary']);
+    on('state-update', onStateUpdate);
+    fire('action', {
+      actionName: 'addTodo',
+      data: {
+        text: 'My todo'
+      }
+    });
+    fire('action', {
+      actionName: 'addTodo',
+      data: {
+        text: 'Another todo'
+      }
+    });
+
+    await waitUntil(() => onStateUpdate.calls.count() == 3);
+
+    expect(JSON.parse(localStorage.getItem('main') ?? '{}')).toEqual({
+      todos: [{ text: 'My todo', quotedText: '"My todo"' }, { text: 'Another todo' }],
+      allTodosSummary: 'My todo, Another todo'
+    });
+    expect(onStateUpdate.calls.argsFor(2)[0].detail).toEqual({
+      stateName: 'main',
+      state: {
+        todos: [{ text: 'My todo', quotedText: '"My todo"' }, { text: 'Another todo' }],
+        allTodosSummary: 'My todo, Another todo'
+      }
+    });
+  });
 });

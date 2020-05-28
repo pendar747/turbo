@@ -1,7 +1,10 @@
 import { autorun, toJS } from 'https://unpkg.com/mobx@5.15.4/lib/mobx.module.js';
 
 import get from 'lodash-es/get';
-import fromPairs from 'lodash-es/fromPairs';
+import set from 'lodash-es/set';
+import merge from 'lodash-es/merge';
+import has from 'lodash-es/has';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { MessageData } from './types';
 
 const registerState = (stateName: string) => (StateClass: any) => {
@@ -11,11 +14,12 @@ const registerState = (stateName: string) => (StateClass: any) => {
   let getters: string[] = [];
   
   autorun(() => {
-    const data = getters.length 
-      ? fromPairs(
-        getters.map(property => [property, toJS(get(state, property))])
-      )
-      : toJS(state);
+    let data = getters.length ? {} : toJS(state);
+    getters.forEach(property => {
+      const dataCopy = cloneDeep(data);
+      set(dataCopy, property, toJS(get(state, property)))
+      data = merge(dataCopy, data);
+    })
     postMessage({
       type: 'state-update',
       stateName,

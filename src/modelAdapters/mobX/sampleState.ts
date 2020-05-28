@@ -9,6 +9,11 @@ class Todo {
     this.text = text;
   }
 
+  @computed
+  get quotedText () {
+    return `"${this.text}"`;
+  }
+
   @action
   edit ({ text }: { text: string }) {
     this.text = text;
