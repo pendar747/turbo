@@ -4,7 +4,6 @@ import get from 'lodash-es/get';
 import set from 'lodash-es/set';
 import merge from 'lodash-es/merge';
 import has from 'lodash-es/has';
-import cloneDeep from 'lodash-es/cloneDeep';
 import { MessageData } from './types';
 
 const registerState = (stateName: string) => (StateClass: any) => {
@@ -16,9 +15,12 @@ const registerState = (stateName: string) => (StateClass: any) => {
   autorun(() => {
     let data = getters.length ? {} : toJS(state);
     getters.forEach(property => {
-      const dataCopy = cloneDeep(data);
-      set(dataCopy, property, toJS(get(state, property)))
-      data = merge(dataCopy, data);
+      const value = toJS(get(state, property));
+      if (has(data, property)) {
+        set(data, property, merge(value, get(data, property)));
+      } else {
+        set(data, property, value)
+      }
     })
     postMessage({
       type: 'state-update',
