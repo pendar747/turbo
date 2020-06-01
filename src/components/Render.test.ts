@@ -11,6 +11,20 @@ describe('Render', () => {
     `);
     expect(el.shadowRoot?.textContent).toEqual('My name is John and I live in New York.');
   });
+  
+  it('should dispatch an event that specifies the getters', async () => {
+    const eventHandler = jasmine.createSpy();
+    on('add-getters', eventHandler);
+    await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
+    const el = await fixture(`
+      <tb-render template="my-template" value="{'name':'John', 'city': 'New York'}"></tb-render>
+    `);
+    expect(eventHandler.calls.count()).toEqual(1);
+    expect(eventHandler.calls.argsFor(0)[0].detail).toEqual({
+      model: null,
+      getters: ['name', 'city']
+    });
+  });
 
   it('should omit a property if its not defined', async () => {
     await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
@@ -43,15 +57,31 @@ describe('Render', () => {
     expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(3)')?.shadowRoot?.textContent).toEqual('So boring by Mike at 27/03/2020');
   });
 
-  it('should work with a model in state', async () => {
-    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
-    await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
-    const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+  describe('rendering a model', async () => {
+    let el: HTMLElement;
+    let eventHandler: jasmine.Spy;
+    beforeAll( async () => {
+      eventHandler = jasmine.createSpy();
+      on('add-getters', eventHandler);
+      localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+      await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
+      const parent = await fixture(`<div state="main"></div>`);
+      el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+    });
+    
+    it('should render the content', () => {
+      expect(el.shadowRoot?.textContent).toEqual('My name is Mike and I live in New York.');
+    });
 
-    expect(el.shadowRoot?.textContent).toEqual('My name is Mike and I live in New York.');
+    it('should dispatch an event that specifies the getters', () => {
+      expect(eventHandler).toHaveBeenCalledTimes(1);
+      expect(eventHandler.calls.argsFor(0)[0].detail).toEqual({
+        model: 'profile',
+        getters: ['name', 'city']
+      });
+    });
   });
-
+  
   it('should update when state changes', async () => {
     localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
     await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
@@ -63,152 +93,118 @@ describe('Render', () => {
     expect(el.shadowRoot?.textContent).toEqual('My name is Mike and I live in Tokyo.');
   });
 
-  it('should render a list when the model is an array', async () => {
-    const state = {
-      profiles: [{
-        name: 'Mike',
-        city: 'New York'
-      }, {
-        name: 'Jimmy',
-        city: 'Boston'
-      }, {
-        name: 'Raj',
-        city: 'Bangalore'
-      }]
-    };
-    localStorage.setItem('list', JSON.stringify(state));
-    await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
-    const parent = await fixture(`<div state="list"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="profiles"></tb-render>`, { parentNode: parent });
-
-    expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(3);
-    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(1)')?.shadowRoot?.textContent)
-      .toEqual('My name is Mike and I live in New York.');
-    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
-      .toEqual('My name is Jimmy and I live in Boston.');
-    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(3)')?.shadowRoot?.textContent)
-      .toEqual('My name is Raj and I live in Bangalore.');
-  });
-
-  it('should update the rendered list when an item in the list is updated', async () => {
-    const state = {
-      profiles: [{
-        name: 'Mike',
-        city: 'New York'
-      }, {
-        name: 'Jimmy',
-        city: 'Boston'
-      }, {
-        name: 'Raj',
-        city: 'Bangalore'
-      }]
-    };
-    localStorage.setItem('list', JSON.stringify(state));
-    await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
-    const parent = await fixture(`<div state="list"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="profiles"></tb-render>`, { parentNode: parent });
-
-    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
-      .toEqual('My name is Jimmy and I live in Boston.');
-
-    fire('list-state-update', {
-      profiles: [{
-        name: 'Mike',
-        city: 'New York'
-      }, {
-        name: 'Bumpzy',
-        city: 'Greenwich'
-      }, {
-        name: 'Raj',
-        city: 'Bangalore'
-      }]
+  describe('rendering lists', () => {
+    let el: HTMLElement;
+    let eventHandler: jasmine.Spy;
+    beforeEach(async () => {
+      eventHandler = jasmine.createSpy();
+      on('add-getters', eventHandler);
+      const state = {
+        profiles: [{
+          name: 'Mike',
+          city: 'New York'
+        }, {
+          name: 'Jimmy',
+          city: 'Boston'
+        }, {
+          name: 'Raj',
+          city: 'Bangalore'
+        }]
+      };
+      localStorage.setItem('list', JSON.stringify(state));
+      await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
+      const parent = await fixture(`<div state="list"></div>`);
+      el = await fixture(`<tb-render template="my-template" model="profiles"></tb-render>`, { parentNode: parent });
     });
     
-    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
-      .toEqual('My name is Bumpzy and I live in Greenwich.');
-  });
-  
-  it('should update the rendered list when an item removed', async () => {
-    const state = {
-      profiles: [{
-        name: 'Mike',
-        city: 'New York'
-      }, {
-        name: 'Jimmy',
-        city: 'Boston'
-      }, {
-        name: 'Raj',
-        city: 'Bangalore'
-      }]
-    };
-    localStorage.setItem('list', JSON.stringify(state));
-    await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
-    const parent = await fixture(`<div state="list"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="profiles"></tb-render>`, { parentNode: parent });
+    it('should render a list when the model is an array', async () => {
+      expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(3);
+      expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(1)')?.shadowRoot?.textContent)
+        .toEqual('My name is Mike and I live in New York.');
+      expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
+        .toEqual('My name is Jimmy and I live in Boston.');
+      expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(3)')?.shadowRoot?.textContent)
+        .toEqual('My name is Raj and I live in Bangalore.');
+    });
 
-    expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(3);
-    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
-      .toEqual('My name is Jimmy and I live in Boston.');
-
-    fire('list-state-update', {
-      profiles: [{
-        name: 'Mike',
-        city: 'New York'
-      }, {
-        name: 'Raj',
-        city: 'Bangalore'
-      }]
+    it('should dispatch getters for each item', () => {
+      expect(eventHandler).toHaveBeenCalledTimes(3);
+      expect(eventHandler.calls.argsFor(0)[0].detail).toEqual({
+        model: 'profiles[0]',
+        getters: ['name', 'city']
+      });
+      expect(eventHandler.calls.argsFor(1)[0].detail).toEqual({
+        model: 'profiles[1]',
+        getters: ['name', 'city']
+      });
+      expect(eventHandler.calls.argsFor(2)[0].detail).toEqual({
+        model: 'profiles[2]',
+        getters: ['name', 'city']
+      });
     });
     
-    expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(2);
-    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
-      .toEqual('My name is Raj and I live in Bangalore.');
-  });
-  
-  it('should update the rendered list when an item added', async () => {
-    const state = {
-      profiles: [{
-        name: 'Mike',
-        city: 'New York'
-      }, {
-        name: 'Jimmy',
-        city: 'Boston'
-      }, {
-        name: 'Raj',
-        city: 'Bangalore'
-      }]
-    };
-    localStorage.setItem('list', JSON.stringify(state));
-    await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
-    const parent = await fixture(`<div state="list"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="profiles"></tb-render>`, { parentNode: parent });
-
-    expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(3);
-    expect(el.shadowRoot?.querySelector('tb-render:last-of-type')?.shadowRoot?.textContent)
-      .toEqual('My name is Raj and I live in Bangalore.');
-
-    const newState = {
-      profiles: [{
-        name: 'Mike',
-        city: 'New York'
-      }, {
-        name: 'Jimmy',
-        city: 'Boston'
-      }, {
-        name: 'Raj',
-        city: 'Bangalore'
-      }, {
-        name: 'Emanuel',
-        city: 'Vienna'
-      }]
-    };
-    localStorage.setItem('list', JSON.stringify(newState));
-    fire('list-state-update', newState);
+    it('should update the rendered list when an item in the list is updated', async () => {
+      fire('list-state-update', {
+        profiles: [{
+          name: 'Mike',
+          city: 'New York'
+        }, {
+          name: 'Bumpzy',
+          city: 'Greenwich'
+        }, {
+          name: 'Raj',
+          city: 'Bangalore'
+        }]
+      });
+      
+      expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
+        .toEqual('My name is Bumpzy and I live in Greenwich.');
+    });
     
-    expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(4);
-    expect(el.shadowRoot?.querySelector('tb-render:last-of-type')?.shadowRoot?.textContent)
-      .toEqual('My name is Emanuel and I live in Vienna.');
+    it('should update the rendered list when an item removed', async () => {
+      fire('list-state-update', {
+        profiles: [{
+          name: 'Mike',
+          city: 'New York'
+        }, {
+          name: 'Raj',
+          city: 'Bangalore'
+        }]
+      });
+      
+      expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(2);
+      expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
+        .toEqual('My name is Raj and I live in Bangalore.');
+    });
+    
+    it('should update the rendered list when an item added', async () => {
+      const newState = {
+        profiles: [{
+          name: 'Mike',
+          city: 'New York'
+        }, {
+          name: 'Jimmy',
+          city: 'Boston'
+        }, {
+          name: 'Raj',
+          city: 'Bangalore'
+        }, {
+          name: 'Emanuel',
+          city: 'Vienna'
+        }]
+      };
+      localStorage.setItem('list', JSON.stringify(newState));
+      fire('list-state-update', newState);
+
+      await elementUpdated(el);
+      
+      expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(4);
+      expect(el.shadowRoot?.querySelector('tb-render:last-of-type')?.shadowRoot?.textContent)
+        .toEqual('My name is Emanuel and I live in Vienna.');
+    });
+
   });
+
   
   it('should fire an event for the given model', async () => {
     localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));

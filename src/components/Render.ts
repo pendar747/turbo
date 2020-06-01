@@ -2,6 +2,7 @@ import { customElement, html, property } from "lit-element";
 import TurboComponent from "./TurboComponent";
 import parseTemplate, { jsonStringifyForHTML } from "./parseTemplate";
 import observeActions from "./observeActions";
+import { fire } from "../util";
 
 @customElement('tb-render')
 export default class Render extends TurboComponent {
@@ -19,6 +20,8 @@ export default class Render extends TurboComponent {
 
   @property()
   unlessValue: string|null = null;
+
+  renderContent: ((data: any) => string)|undefined;
 
   private observer: MutationObserver|undefined;
 
@@ -63,13 +66,27 @@ export default class Render extends TurboComponent {
     }
   }
 
+  connectedCallback () {
+    super.connectedCallback();
+    const { render, getters } = parseTemplate(this.templateContent);
+    this.renderContent = render;
+    if (!Array.isArray(this.modelValue)) {
+      fire('add-getters', {
+        model: this.model,
+        getters
+      });
+    }
+  }
+
   render () {
     if (this.modelValue === null || this.modelValue === undefined) {
       return;
     }
-    const content = Array.isArray(this.modelValue) 
+    const content = Array.isArray(this.modelValue)
       ? html`<div id="container">${this.renderElements()}</div>`
-      : html`<div id="container" .innerHTML="${parseTemplate(this.templateContent).render(this.modelValue)}"></div>`;
+      : this.renderContent 
+        ? html`<div id="container" .innerHTML="${this.renderContent(this.modelValue)}"></div>` 
+        : '';
 
     if (this.if) {
       return html`<tb-if model="${this.if}">${content}</tb-if>`;
