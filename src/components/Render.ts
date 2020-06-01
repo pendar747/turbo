@@ -70,8 +70,8 @@ export default class Render extends TurboComponent {
     super.connectedCallback();
     const { render, getters } = parseTemplate(this.templateContent);
     this.renderContent = render;
-    if (!Array.isArray(this.modelValue)) {
-      fire('add-getters', {
+    if (!Array.isArray(this.modelValue) && this.stateName) {
+      fire(`${this.stateName}-add-getters`, {
         model: this.model,
         getters
       });

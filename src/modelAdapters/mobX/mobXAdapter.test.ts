@@ -95,7 +95,7 @@ describe('mobXAdapter', () => {
   
   it('should expose computed properties', async () => {
     const onStateUpdate = jasmine.createSpy();
-    fire('main-getters-update', ['todos', 'allTodosSummary']);
+    fire('main-add-getters', ['todos', 'allTodosSummary']);
     on('state-update', onStateUpdate);
     fire('action', {
       actionName: 'addTodo',
@@ -125,11 +125,11 @@ describe('mobXAdapter', () => {
     });
   });
   
-  it('should nested computed properties', async () => {
+  it('should handle nested computed properties', async () => {
     const onStateUpdate = jasmine.createSpy();
     // TODO: find the best way to represent getters
     // and what to do with the problem of render not knowing if something is an array or not
-    fire('main-getters-update', ['todos[0].quotedText', 'todos', 'allTodosSummary']);
+    fire('main-add-getters', ['todos[0].quotedText', 'todos', 'allTodosSummary']);
     on('state-update', onStateUpdate);
     fire('action', {
       actionName: 'addTodo',

@@ -18,7 +18,7 @@ const runState = (src: string, stateName: string): Worker => {
     }
   }
 
-  on(`${stateName}-getters-update`, (event) => {
+  on(`${stateName}-add-getters`, (event) => {
     const messageData: MessageData = {
       stateName,
       type: 'getters-update',

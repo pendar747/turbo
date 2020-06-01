@@ -12,6 +12,8 @@ export default abstract class TurboComponent extends LitElement {
   @property()
   value: string|null = null;
 
+  protected _stateName: string|null = null;
+
   protected modelValue: { [key in string]: any }|null = null;
   
   protected handleStateUpdate (state: any) {
@@ -33,28 +35,28 @@ export default abstract class TurboComponent extends LitElement {
     }
   }
 
-  private getStateName () {
-    let stateName = null;
+  protected get stateName () {
+    if (this._stateName) {
+      return this._stateName;
+    }
     let parent: Element|null|undefined = this;
-    while (parent && !stateName) {
+    while (parent && !this._stateName) {
       if (parent?.hasAttribute('state')) {
-        stateName = parent.getAttribute('state'); 
+        this._stateName = parent.getAttribute('state'); 
       } else {
         parent = parent?.parentNode instanceof ShadowRoot
           ? parent?.parentNode.host 
           : parent.parentElement;
       }
     }
-    return stateName;
+    return this._stateName;
   }
   
   connectedCallback () {
     if (this.model) {
-      const stateName = this.getStateName();
-      
-      if (stateName) {
+      if (this.stateName) {
         // get the initial state from local storage
-        const storedState = localStorage.getItem(stateName);
+        const storedState = localStorage.getItem(this.stateName);
         if(storedState) {
           try {
             this.handleStateUpdate(JSON.parse(storedState));
@@ -63,7 +65,7 @@ export default abstract class TurboComponent extends LitElement {
           }
         }
         // watch for state updates
-        on(`${stateName}-state-update`, (event) => {
+        on(`${this.stateName}-state-update`, (event) => {
           this.handleStateUpdate(event.detail);
         });
       }

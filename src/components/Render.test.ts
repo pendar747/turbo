@@ -12,18 +12,14 @@ describe('Render', () => {
     expect(el.shadowRoot?.textContent).toEqual('My name is John and I live in New York.');
   });
   
-  it('should dispatch an event that specifies the getters', async () => {
+  it('should not dispatch an event that specifies the getters', async () => {
     const eventHandler = jasmine.createSpy();
     on('add-getters', eventHandler);
     await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
     const el = await fixture(`
       <tb-render template="my-template" value="{'name':'John', 'city': 'New York'}"></tb-render>
     `);
-    expect(eventHandler.calls.count()).toEqual(1);
-    expect(eventHandler.calls.argsFor(0)[0].detail).toEqual({
-      model: null,
-      getters: ['name', 'city']
-    });
+    expect(eventHandler).toHaveBeenCalledTimes(0);
   });
 
   it('should omit a property if its not defined', async () => {
@@ -62,7 +58,7 @@ describe('Render', () => {
     let eventHandler: jasmine.Spy;
     beforeAll( async () => {
       eventHandler = jasmine.createSpy();
-      on('add-getters', eventHandler);
+      on('main-add-getters', eventHandler);
       localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
       await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
       const parent = await fixture(`<div state="main"></div>`);
@@ -98,7 +94,7 @@ describe('Render', () => {
     let eventHandler: jasmine.Spy;
     beforeEach(async () => {
       eventHandler = jasmine.createSpy();
-      on('add-getters', eventHandler);
+      on('list-add-getters', eventHandler);
       const state = {
         profiles: [{
           name: 'Mike',
