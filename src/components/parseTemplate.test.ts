@@ -1,9 +1,9 @@
-import { renderContent } from "./renderContent";
+import parseTemplate from "./parseTemplate";
 
 describe('render content', () => {
   it('should render content with templates', () => {
     const template = 'My name is {name} and I live in {city} and I love {food}.';
-    const output = renderContent(template)({ name: 'John', city: 'London', food: 'pancakes' });
+    const output = parseTemplate(template).render({ name: 'John', city: 'London', food: 'pancakes' });
     expect(output).toBe('My name is John and I live in London and I love pancakes.');
   });
   
@@ -11,7 +11,7 @@ describe('render content', () => {
     const template = `My name is {name} 
     and I live in {city} 
     and I love {food}.`;
-    const output = renderContent(template)({ name: 'John', city: 'London', food: 'pancakes' });
+    const output = parseTemplate(template).render({ name: 'John', city: 'London', food: 'pancakes' });
     expect(output).toBe(`My name is John 
     and I live in London 
     and I love pancakes.`);
@@ -19,49 +19,55 @@ describe('render content', () => {
 
   it('should be forgiving with spaces in template prop names', () => {
     const template = 'My name is { name} and I live in { city } and I love {food}.';
-    const output = renderContent(template)({ name: 'John', city: 'London', food: 'pancakes' });
+    const output = parseTemplate(template).render({ name: 'John', city: 'London', food: 'pancakes' });
     expect(output).toBe('My name is John and I live in London and I love pancakes.');
   });
   
   it('should replace multiple instances of a property', () => {
     const template = 'My name is { name} and my friend is also called {name}.';
-    const output = renderContent(template)({ name: 'John', city: 'London', food: 'pancakes' });
+    const output = parseTemplate(template).render({ name: 'John', city: 'London', food: 'pancakes' });
     expect(output).toBe('My name is John and my friend is also called John.');
   });
   
   it('should print the keyword "this" as html friendly json', () => {
     const template = '<span>{name}</span><tb-render template="template-id" value="{this}"></tb-render>';
-    const output = renderContent(template)({ name: 'John', city: 'London', food: 'pancakes' });
+    const output = parseTemplate(template).render({ name: 'John', city: 'London', food: 'pancakes' });
     expect(output).toBe('<span>John</span><tb-render template="template-id" value="{\'name\':\'John\',\'city\':\'London\',\'food\':\'pancakes\'}"></tb-render>');
   });
   
   it('should print an object property as html friendly json', () => {
     const template = '<span>{name}</span><tb-render template="template-id" value="{stuff}"></tb-render>';
-    const output = renderContent(template)({ name: 'John', city: 'London', stuff: { food: 'pancakes', desert: 'cheese' } });
+    const output = parseTemplate(template).render({ name: 'John', city: 'London', stuff: { food: 'pancakes', desert: 'cheese' } });
     expect(output).toBe('<span>John</span><tb-render template="template-id" value="{\'food\':\'pancakes\',\'desert\':\'cheese\'}"></tb-render>');
   });
 
   it('should omit null and undefined property values', () => {
     const template = 'My name is {name} and I live in {city} and I love {food}.';
-    const output = renderContent(template)({ name: null, city: 'London' });
+    const output = parseTemplate(template).render({ name: null, city: 'London' });
     expect(output).toBe('My name is  and I live in London and I love .');
   });
 
   it('should replace array properties', () => {
     const template = 'My name is {name} and I have {friends.length} friends.';
-    const output = renderContent(template)({ name: 'Pete', friends: ['Alex', 'Dave'] });
+    const output = parseTemplate(template).render({ name: 'Pete', friends: ['Alex', 'Dave'] });
     expect(output).toBe('My name is Pete and I have 2 friends.');
   });
   
   it('should print an item of an array', () => {
     const template = 'My name is {name} and {friends[0]} is my best mate.';
-    const output = renderContent(template)({ name: 'James', friends: ['Alex', 'Dave'] });
+    const output = parseTemplate(template).render({ name: 'James', friends: ['Alex', 'Dave'] });
     expect(output).toBe('My name is James and Alex is my best mate.');
   });
   
   it('should print an nested properties', () => {
     const template = 'My name is {name} and {friends[0].lastName} is my best mate.';
-    const output = renderContent(template)({ name: 'James', friends: [{ lastName: 'Barkinsov', firstname: 'Sash' }, 'Dave'] });
+    const output = parseTemplate(template).render({ name: 'James', friends: [{ lastName: 'Barkinsov', firstname: 'Sash' }, 'Dave'] });
     expect(output).toBe('My name is James and Barkinsov is my best mate.');
+  });
+  
+  it('should return a list of property names', () => {
+    const template = 'My name is {name} and I live in {city} and I love {food}.';
+    const output = parseTemplate(template);
+    expect(output.getters).toEqual(['name', 'city', 'food']);
   });
 });

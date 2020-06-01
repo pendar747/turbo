@@ -1,6 +1,6 @@
 import { customElement, html, property } from "lit-element";
 import TurboComponent from "./TurboComponent";
-import { jsonParseFromHtml } from "./renderContent";
+import { jsonParseFromHtml } from "./parseTemplate";
 
 @customElement('tb-unless')
 export default class Unless extends TurboComponent {

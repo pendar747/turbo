@@ -1,6 +1,6 @@
 import { customElement, html, property } from "lit-element";
 import TurboComponent from "./TurboComponent";
-import { renderContent, jsonStringifyForHTML } from "./renderContent";
+import parseTemplate, { jsonStringifyForHTML } from "./parseTemplate";
 import observeActions from "./observeActions";
 
 @customElement('tb-render')
@@ -69,7 +69,7 @@ export default class Render extends TurboComponent {
     }
     const content = Array.isArray(this.modelValue) 
       ? html`<div id="container">${this.renderElements()}</div>`
-      : html`<div id="container" .innerHTML="${renderContent(this.templateContent)(this.modelValue)}"></div>`;
+      : html`<div id="container" .innerHTML="${parseTemplate(this.templateContent).render(this.modelValue)}"></div>`;
 
     if (this.if) {
       return html`<tb-if model="${this.if}">${content}</tb-if>`;

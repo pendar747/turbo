@@ -1,6 +1,6 @@
 import { customElement, html, property } from "lit-element";
 import TurboComponent from "./TurboComponent";
-import { jsonParseFromHtml } from "./renderContent";
+import { jsonParseFromHtml } from "./parseTemplate";
 
 @customElement('tb-if')
 export default class If extends TurboComponent {

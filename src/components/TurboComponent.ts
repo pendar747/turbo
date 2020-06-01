@@ -1,6 +1,6 @@
 import { LitElement, property } from "lit-element";
 import { on } from "../util";
-import { jsonParseFromHtml } from "./renderContent";
+import { jsonParseFromHtml } from "./parseTemplate";
 import get from 'lodash-es/get';
 import isEqual from 'lodash-es/isEqual';
 

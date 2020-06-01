@@ -1,5 +1,6 @@
 import get from 'lodash-es/get';
 import isNil from 'lodash-es/isNil';
+import uniq from 'lodash-es/uniq';
 
 const templatePattern = new RegExp(/\{\s?([0-9a-zA-Z\.\[\]]+)\s?\}/g);
 
@@ -34,21 +35,30 @@ const replaceMatches = (charList: string[], matchRanges: MatchRange[], data: any
   return newCharList.join('');
 }
 
-export const renderContent = (template: string) => {
+export const parseTemplate = (template: string) => {
 
   const matches = template.matchAll(templatePattern);
   const matchRanges: MatchRange[] = [];
+  let getters = [];
   for (const match of matches) {
     if (match.length >= 2 && match.index !== undefined) {
       const propName = match[1];
+      getters.push(propName);
       matchRanges.push({ propName, range: [match.index, match.index + match[0].length] })
     }
   }
   const charList = template.split('');
 
-  return (item: any): string => {
+  const render = (item: any): string => {
     const json = jsonStringifyForHTML(item);
     let data: any = { ...item, 'this': json };
     return replaceMatches(charList, matchRanges, data);
   }
+
+  return {
+    render,
+    getters: uniq(getters)
+  }
 }
+
+export default parseTemplate;
