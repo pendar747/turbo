@@ -1,4 +1,4 @@
-import { autorun, toJS } from 'https://unpkg.com/mobx@5.15.4/lib/mobx.module.js';
+import { autorun, toJS, observable } from 'https://unpkg.com/mobx@5.15.4/lib/mobx.module.js';
 
 import get from 'lodash-es/get';
 import set from 'lodash-es/set';
@@ -9,12 +9,11 @@ import { MessageData } from './types';
 const registerState = (stateName: string) => (StateClass: any) => {
   const state = new StateClass();
 
-  
-  let getters: string[] = [];
+  const getters: any = observable.box([]);
   
   autorun(() => {
-    let data = getters.length ? {} : toJS(state);
-    getters.forEach(property => {
+    let data = getters.get().length ? {} : toJS(state);
+    getters.get().forEach((property: string) => {
       const value = toJS(get(state, property));
       if (has(data, property)) {
         set(data, property, merge(value, get(data, property)));
@@ -39,7 +38,10 @@ const registerState = (stateName: string) => (StateClass: any) => {
       }
     }
     if (type == 'getters-update') {
-      getters = data;
+      const newGetters = (data as string[])
+        .filter(getter => !getters.get().includes(getter))
+      getters.set([...getters.get(), ...newGetters]);
+      console.log('set new getters');
     }
   }
 }

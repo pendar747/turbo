@@ -7,7 +7,7 @@ describe('mobXAdapter', () => {
   let originalTimeout: number;
   beforeAll(() => {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000; 
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
   });
 
   afterAll(() => {
@@ -62,7 +62,7 @@ describe('mobXAdapter', () => {
       }
     });
   });
-  
+
   it('should update a model in the state', async () => {
     const onStateUpdate = jasmine.createSpy();
     on('state-update', onStateUpdate);
@@ -92,70 +92,77 @@ describe('mobXAdapter', () => {
       }
     });
   });
-  
-  it('should expose computed properties', async () => {
-    const onStateUpdate = jasmine.createSpy();
-    fire('main-add-getters', ['todos', 'allTodosSummary']);
-    on('state-update', onStateUpdate);
-    fire('action', {
-      actionName: 'addTodo',
-      data: {
-        text: 'My todo'
-      }
-    });
-    fire('action', {
-      actionName: 'addTodo',
-      data: {
-        text: 'Another todo'
-      }
+
+  describe('getters', () => {
+
+    let onStateUpdate: jasmine.Spy;
+    beforeEach( async () => {
+      onStateUpdate = jasmine.createSpy();
+      on('state-update', onStateUpdate);
+      fire('action', {
+        actionName: 'addTodo',
+        data: {
+          text: 'My todo'
+        }
+      });
+      fire('action', {
+        actionName: 'addTodo',
+        data: {
+          text: 'Another todo'
+        }
+      });
     });
 
-    await waitUntil(() => onStateUpdate.calls.count() == 3);
+    it('should expose computed properties', async () => {
+      fire('main-add-getters', ['todos', 'allTodosSummary']);
+      await waitUntil(() => onStateUpdate.calls.count() == 4);
 
-    expect(JSON.parse(localStorage.getItem('main') ?? '{}')).toEqual({
-      todos: [{ text: 'My todo' }, { text: 'Another todo' }],
-      allTodosSummary: 'My todo, Another todo'
-    });
-    expect(onStateUpdate.calls.argsFor(2)[0].detail).toEqual({
-      stateName: 'main',
-      state: {
+      expect(JSON.parse(localStorage.getItem('main') ?? '{}')).toEqual({
         todos: [{ text: 'My todo' }, { text: 'Another todo' }],
         allTodosSummary: 'My todo, Another todo'
-      }
-    });
-  });
-  
-  it('should handle nested computed properties', async () => {
-    const onStateUpdate = jasmine.createSpy();
-    // TODO: find the best way to represent getters
-    // and what to do with the problem of render not knowing if something is an array or not
-    fire('main-add-getters', ['todos[0].quotedText', 'todos', 'allTodosSummary']);
-    on('state-update', onStateUpdate);
-    fire('action', {
-      actionName: 'addTodo',
-      data: {
-        text: 'My todo'
-      }
-    });
-    fire('action', {
-      actionName: 'addTodo',
-      data: {
-        text: 'Another todo'
-      }
+      });
+      expect(onStateUpdate.calls.argsFor(3)[0].detail).toEqual({
+        stateName: 'main',
+        state: {
+          todos: [{ text: 'My todo' }, { text: 'Another todo' }],
+          allTodosSummary: 'My todo, Another todo'
+        }
+      });
     });
 
-    await waitUntil(() => onStateUpdate.calls.count() == 3);
-
-    expect(JSON.parse(localStorage.getItem('main') ?? '{}')).toEqual({
-      todos: [{ text: 'My todo', quotedText: '"My todo"' }, { text: 'Another todo' }],
-      allTodosSummary: 'My todo, Another todo'
-    });
-    expect(onStateUpdate.calls.argsFor(2)[0].detail).toEqual({
-      stateName: 'main',
-      state: {
+    it('should handle nested computed properties', async () => {
+      fire('main-add-getters', ['todos[0].quotedText', 'todos', 'allTodosSummary']);
+      await waitUntil(() => onStateUpdate.calls.count() == 4);
+      
+      expect(JSON.parse(localStorage.getItem('main') ?? '{}')).toEqual({
         todos: [{ text: 'My todo', quotedText: '"My todo"' }, { text: 'Another todo' }],
         allTodosSummary: 'My todo, Another todo'
-      }
+      });
+      expect(onStateUpdate.calls.argsFor(3)[0].detail).toEqual({
+        stateName: 'main',
+        state: {
+          todos: [{ text: 'My todo', quotedText: '"My todo"' }, { text: 'Another todo' }],
+          allTodosSummary: 'My todo, Another todo'
+        }
+      });
     });
+
+    it('should accumulate multiple getters that are added by different events', async () => {
+      fire('main-add-getters', ['todos[0].quotedText', 'todos', 'allTodosSummary']);
+      fire('main-add-getters', ['todos[1].quotedText']);
+      await waitUntil(() => onStateUpdate.calls.count() == 5);
+
+      const expectedState = {
+        todos: [{ text: 'My todo', quotedText: '"My todo"' }, { text: 'Another todo', quotedText: '"Another todo"' }],
+        allTodosSummary: 'My todo, Another todo'
+      };
+      expect(JSON.parse(localStorage.getItem('main') ?? '{}')).toEqual(expectedState);
+      expect(onStateUpdate.calls.argsFor(4)[0].detail).toEqual({
+        stateName: 'main',
+        state: expectedState
+      })
+    });
+
   });
+
 });
