@@ -1,6 +1,6 @@
 import { customElement, html, property } from "lit-element";
 import TurboComponent from "./TurboComponent";
-import parseTemplate, { jsonStringifyForHTML } from "./parseTemplate";
+import parseTemplate from "./parseTemplate";
 import observeActions from "./observeActions";
 import { fire } from "../util";
 
@@ -13,13 +13,7 @@ export default class Render extends TurboComponent {
   if: string|null = null;
 
   @property()
-  ifValue: string|null = null;
-
-  @property()
   unless: string|null = null;
-
-  @property()
-  unlessValue: string|null = null;
 
   renderContent: ((data: any) => string)|undefined;
 
@@ -30,15 +24,12 @@ export default class Render extends TurboComponent {
   }
   
   renderElements () {
-    if (!this.modelValue) {
+    if (!this.value) {
       return;
     }
-    return this.modelValue.map((valueItem: any, index: number) => {
+    return this.value.map((valueItem: any, index: number) => {
       if (this.model) {
         return html`<tb-render model="${this.model}[${index}]" template="${this.template}"></tb-render>`
-      }
-      if (this.value) {
-        return html`<tb-render value="${jsonStringifyForHTML(valueItem)}" template="${this.template}"></tb-render>`
       }
     })
   }
@@ -70,7 +61,7 @@ export default class Render extends TurboComponent {
     super.connectedCallback();
     const { render, getters } = parseTemplate(this.templateContent);
     this.renderContent = render;
-    if (!Array.isArray(this.modelValue) && this.stateName) {
+    if (!Array.isArray(this.value) && this.stateName) {
       fire(`${this.stateName}-add-getters`, {
         model: this.model,
         getters
@@ -79,31 +70,23 @@ export default class Render extends TurboComponent {
   }
 
   render () {
-    if (this.modelValue === null || this.modelValue === undefined) {
+    if (this.value === null || this.value === undefined) {
       return;
     }
-    const content = Array.isArray(this.modelValue)
+    const content = Array.isArray(this.value)
       ? html`<div id="container">${this.renderElements()}</div>`
       : this.renderContent 
-        ? html`<div id="container" .innerHTML="${this.renderContent(this.modelValue)}"></div>` 
+        ? html`<div id="container" .innerHTML="${this.renderContent(this.value)}"></div>` 
         : '';
 
     if (this.if) {
       return html`<tb-if model="${this.if}">${content}</tb-if>`;
     }
 
-    if (this.ifValue) {
-      return html`<tb-if value="${this.ifValue}">${content}</tb-if>`;
-    }
-
     if (this.unless) {
       return html`<tb-unless model="${this.unless}">${content}</tb-unless>`;
     }
     
-    if (this.unlessValue) {
-      return html`<tb-unless value="${this.unlessValue}">${content}</tb-unless>`;
-    }
-
     return content;
   }
 }

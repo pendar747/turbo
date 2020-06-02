@@ -56,8 +56,8 @@ class Form extends TurboComponent {
 
   render () {
     this.inputElements.forEach(el => {
-      if (this.modelValue) {
-        el.value = this.modelValue[el.name];
+      if (this.value) {
+        el.value = this.value[el.name];
       }
     });
     return html`<form @submit="${this.handleSubmit}">
