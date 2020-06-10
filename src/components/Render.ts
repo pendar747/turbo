@@ -28,9 +28,7 @@ export default class Render extends TurboComponent {
       return;
     }
     return this.value.map((valueItem: any, index: number) => {
-      if (this.model) {
-        return html`<tb-render model="${this.model}[${index}]" template="${this.template}"></tb-render>`
-      }
+      return html`<tb-render no-context model="${this.fullModelPath}[${index}]" template="${this.template}"></tb-render>`
     })
   }
 
@@ -67,6 +65,15 @@ export default class Render extends TurboComponent {
         getters
       });
     }
+  }
+
+  updated (changedProps: any) {
+    this.shadowRoot?.querySelectorAll('tb-render').forEach(el => {
+      if (this.model && !el.hasAttribute('context') && !el.hasAttribute('no-context')) {
+        el.setAttribute('context', this.model);
+      }
+    })
+    super.updated(changedProps);
   }
 
   render () {

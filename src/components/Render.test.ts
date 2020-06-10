@@ -118,7 +118,7 @@ describe('Render', () => {
           city: 'Bangalore'
         }]
       });
-      
+
       expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(2);
       expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
         .toEqual('My name is Raj and I live in Bangalore.');
@@ -206,5 +206,66 @@ describe('Render', () => {
     await elementUpdated(el);
     
     expect(el.shadowRoot?.innerHTML).toEqual('<!----><div id="container"><span>David</span><input tb-action="keyup:setName" id="my-input"></div><!---->');
+  });
+
+  it('should render with context', async () => {
+    localStorage.setItem('main', JSON.stringify(
+      { 
+        profile: { 
+          name: 'Mike', city: 'New York',
+          friends: [{
+            name: 'Steve',
+            city: 'Berlin'
+          }, {
+            name: 'James',
+            city: 'London'
+          }]
+        },
+      }
+    ));
+    await fixture('<template id="my-template"><span>{name} lives in {city}</span></template>')
+    const parent = await fixture(`<div state="main"></div>`);
+    const el = await fixture(`<tb-render context="profile" template="my-template" model="friends"></tb-render>`, { parentNode: parent });
+
+    expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(2);
+    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(1)')?.shadowRoot?.textContent)
+      .toEqual('Steve lives in Berlin');
+    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
+      .toEqual('James lives in London');
+  });
+
+  
+  it('should render nested templates', async () => {
+    localStorage.setItem('main', JSON.stringify(
+      { 
+        profile: { 
+          name: 'Mike', city: 'New York',
+          friends: [{
+            name: 'Steve',
+            city: 'Berlin'
+          }, {
+            name: 'James',
+            city: 'London'
+          }]
+        },
+      }
+    ));
+    await fixture(`<template id="my-template">
+      <span>{name} lives in {city}</span>
+      <div>
+        <h2>friends</h2>
+        <tb-render template="my-template" model="friends"></tb-render>
+      </div>
+    </template>`)
+    const parent = await fixture(`<div state="main"></div>`);
+    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+
+    const nestedRender = el.shadowRoot?.querySelector('tb-render');
+
+    expect(nestedRender?.shadowRoot?.querySelectorAll('tb-render').length).toEqual(2);
+    expect(nestedRender?.shadowRoot?.querySelector('tb-render:nth-of-type(1)')?.shadowRoot?.textContent)
+      .toContain('Steve lives in Berlin');
+    expect(nestedRender?.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
+      .toContain('James lives in London');
   });
 });

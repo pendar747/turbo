@@ -1,25 +1,27 @@
 import { LitElement, property } from "lit-element";
 import { on } from "../util";
 import get from 'lodash-es/get';
-import isEqual from 'lodash-es/isEqual';
 
 export default abstract class TurboComponent extends LitElement {
+
+  @property()
+  context: string|null = null;
   
   @property()
   model: string|null = null;
 
+  private state: any = {};
+
   protected _stateName: string|null = null;
 
-  protected value: { [key in string]: any }|null = null;
-  
-  protected handleStateUpdate (state: any) {
-    const prevModelValue = this.value;
-    this.value = get(state, this.model||'', null);
-    if (!isEqual(this.value, prevModelValue)) {
-      this.performUpdate();
-    }
-  }
+  protected get value (): { [key in string]: any }|null {
+    return get(this.state, this.fullModelPath, null);
+  };
 
+  protected get fullModelPath () {
+    return this.context ? `${this.context}.${this.model}` : (this.model ?? '');
+  }
+  
   protected get stateName () {
     if (this._stateName) {
       return this._stateName;
@@ -36,23 +38,29 @@ export default abstract class TurboComponent extends LitElement {
     }
     return this._stateName;
   }
-    
-  connectedCallback () {
+
+  private getStoredState () {
     if (this.model && this.stateName) {
       // get the initial state from local storage
       const storedState = localStorage.getItem(this.stateName);
       if(storedState) {
         try {
-          this.handleStateUpdate(JSON.parse(storedState));
+          this.state = JSON.parse(storedState);
+          this.performUpdate();
         } catch (error) {
           console.error(`Failed to parse ${this.stateName}`);
         }
       }
-      // watch for state updates
-      on(`${this.stateName}-state-update`, (event) => {
-        this.handleStateUpdate(event.detail);
-      });
     }
+  }
+    
+  connectedCallback () {
+    // watch for state updates
+    this.getStoredState();
+    on(`${this.stateName}-state-update`, (event) => {
+      this.state = event.detail;
+      this.performUpdate();
+    });
     super.connectedCallback();
   }
 
