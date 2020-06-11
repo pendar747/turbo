@@ -268,4 +268,73 @@ describe('Render', () => {
     expect(nestedRender?.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
       .toContain('James lives in London');
   });
+  
+  it('should render nested list templates', async () => {
+    localStorage.setItem('main', JSON.stringify(
+      { 
+        profile: [{ 
+          name: 'Mike',
+          city: {
+            name: 'London',
+            population: 10000000
+          }
+        }, {
+          name: 'Jim',
+          city: {
+            name: 'New York',
+            population: 18000000
+          }
+        }],
+      }
+    ));
+    await fixture('<template id="city">{name} has a population of {population} people.</template>');
+    await fixture(`<template id="my-template">
+      <span>My name is {name}</span>
+      <tb-render template="city" model="city"></tb-render>
+    </template>`)
+    const parent = await fixture(`<div state="main"></div>`);
+    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+
+    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(1)')
+      ?.shadowRoot?.querySelector('tb-render')?.shadowRoot?.textContent).toEqual('London has a population of 10000000 people.');
+    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')
+      ?.shadowRoot?.querySelector('tb-render')?.shadowRoot?.textContent).toEqual('New York has a population of 18000000 people.');
+  });
+
+   
+  it('should render without context when no-context attribute is added', async () => {
+    localStorage.setItem('main', JSON.stringify(
+      { 
+        mainCity: {
+          name: 'Los Angeles',
+          population: 10
+        },
+        profile: [{ 
+          name: 'Mike',
+          city: {
+            name: 'London',
+            population: 10000000
+          }
+        }, {
+          name: 'Jim',
+          city: {
+            name: 'New York',
+            population: 18000000
+          }
+        }],
+      }
+    ));
+    await fixture('<template id="city">{name} has a population of {population} people.</template>');
+    await fixture(`<template id="my-template">
+      <span>My name is {name}</span>
+      <tb-render template="city" no-context model="mainCity"></tb-render>
+    </template>`)
+    const parent = await fixture(`<div state="main"></div>`);
+    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+
+    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(1)')
+      ?.shadowRoot?.querySelector('tb-render')?.shadowRoot?.textContent).toEqual('Los Angeles has a population of 10 people.');
+    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')
+      ?.shadowRoot?.querySelector('tb-render')?.shadowRoot?.textContent).toEqual('Los Angeles has a population of 10 people.');
+  });
 });
