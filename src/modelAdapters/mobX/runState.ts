@@ -1,8 +1,7 @@
 import { on, fire } from "../../util";
 import { MessageData } from "./types";
 
-const runState = (src: string, stateName: string): Worker => {
-  const worker = new Worker(src, { type: 'module' });
+const runState = (worker: Worker, stateName: string): Worker => {
   worker.onerror = (event) => {
     console.error(event.message, event.filename, event.lineno);
   }

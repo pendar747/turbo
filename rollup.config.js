@@ -13,13 +13,7 @@ module.exports = [
     plugins: [
       resolve(),
       commonjs({
-        include: /node_modules/,
-        namedExports: {
-          'node_modules/lodash/lodash.js': [
-            'get',
-            'isEqual'
-          ],
-        }
+        include: /node_modules/
       }),
       typescriptPlugin(),
       jsonPlugin(),
@@ -37,6 +31,31 @@ module.exports = [
     output: [
       { format: 'cjs', file: pkg.main },
       { format: 'es', file: pkg.module }
+    ]
+  },
+  {
+    input: 'src/modelAdapters/mobX/index.ts',
+    plugins: [
+      resolve(),
+      commonjs({
+        include: /node_modules/
+      }),
+      typescriptPlugin(),
+      jsonPlugin(),
+      css({
+        output: 'dist/default-theme.css',
+        include: 'src/styles/**/*.css'
+      }),
+      string({
+        include: "**/*.css"
+      }),
+      // visualizer({
+      //   filename: 'reports/bundle-analysis.html'
+      // })
+    ],
+    output: [
+      { format: 'cjs', file: 'dist/mobxAdapter.js' },
+      { format: 'es', file: 'dist/mobxAdapter.module.js' }
     ]
   }
 ];

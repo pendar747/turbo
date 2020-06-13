@@ -1,4 +1,4 @@
-import { autorun, toJS, observable } from 'https://unpkg.com/mobx@5.15.4/lib/mobx.module.js';
+import { autorun, toJS, observable } from 'mobx';
 
 import get from 'lodash-es/get';
 import set from 'lodash-es/set';

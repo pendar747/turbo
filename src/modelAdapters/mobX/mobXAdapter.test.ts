@@ -17,7 +17,8 @@ describe('mobXAdapter', () => {
   let worker: Worker;
 
   beforeEach(() => {
-    worker = runState('/base/dist/modelAdapters/mobX/sampleState.js', 'main');
+    worker = new Worker('/base/dist/modelAdapters/mobX/sampleState.js', { type: 'module' });
+    runState(worker, 'main');
   });
 
   afterEach(() => {
