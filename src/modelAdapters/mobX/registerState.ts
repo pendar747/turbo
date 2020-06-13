@@ -41,7 +41,6 @@ const registerState = (stateName: string) => (StateClass: any) => {
       const newGetters = (data as string[])
         .filter(getter => !getters.get().includes(getter))
       getters.set([...getters.get(), ...newGetters]);
-      console.log('set new getters');
     }
   }
 }

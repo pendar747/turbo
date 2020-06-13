@@ -3,6 +3,7 @@ import TurboComponent from "./TurboComponent";
 import parseTemplate from "./parseTemplate";
 import observeActions from "./observeActions";
 import { fire } from "../util";
+import ClassObserver from "./ClassObserver";
 
 @customElement('tb-render')
 export default class Render extends TurboComponent {
@@ -17,7 +18,8 @@ export default class Render extends TurboComponent {
 
   renderContent: ((data: any) => string)|undefined;
 
-  private observer: MutationObserver|undefined;
+  private actionObserver: MutationObserver|undefined;
+  private classObserver: ClassObserver|undefined;
 
   private get templateContent () {
     return this.template ? document.getElementById(this.template)?.innerHTML || '' : '';
@@ -35,24 +37,24 @@ export default class Render extends TurboComponent {
   constructor () {
     super();
     if (this.shadowRoot) {
-      this.observer = observeActions(this.shadowRoot, { model: this.model });
+      this.actionObserver = observeActions(this.shadowRoot, { model: this.model });
+      this.classObserver = new ClassObserver(this.shadowRoot, this.value);
     }
   }
 
   attributeChangedCallback (name: string, old: string, value: string) {
     super.attributeChangedCallback(name, old, value);
     if (name === 'model') {
-      this.observer?.disconnect();
+      this.actionObserver?.disconnect();
       if (this.shadowRoot) {
-        this.observer = observeActions(this.shadowRoot, { model: this.model })
+        this.actionObserver = observeActions(this.shadowRoot, { model: this.model })
       }
     }
   }
 
   disconnectedCallback () {
-    if (this.observer) {
-      this.observer.disconnect();
-    }
+    this.actionObserver?.disconnect();
+    this.classObserver?.disconnect();
   }
 
   connectedCallback () {
@@ -77,6 +79,9 @@ export default class Render extends TurboComponent {
   }
 
   render () {
+    if (this.classObserver) {
+      this.classObserver.data = this.value;
+    }
     if (this.value === null || this.value === undefined) {
       return;
     }

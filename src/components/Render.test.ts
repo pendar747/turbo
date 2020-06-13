@@ -337,4 +337,55 @@ describe('Render', () => {
     expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')
       ?.shadowRoot?.querySelector('tb-render')?.shadowRoot?.textContent).toEqual('Los Angeles has a population of 10 people.');
   });
+
+  it('should assign classes with tb-class when a condition is true', async () => {
+    localStorage.setItem('main', JSON.stringify({
+      task: {
+        isDone: false,
+        isNew: true,
+        task: 'Buy milk'
+      }
+    }));
+    await fixture(`<template id="my-template">
+      <style>
+        .new-task {
+          background-color: red;
+        }
+        .border {
+          border: 1px solid black;
+        }
+        .green {
+          color: green;
+        }
+      </style>
+      <div id="my-div" tb-class="isDone:green,border;isNew:new-task">{task}</div>
+    </template>`)
+    const parent = await fixture(`<div state="main"></div>`);
+    const el = await fixture(`<tb-render template="my-template" model="task"></tb-render>`, { parentNode: parent });    
+
+    const div = el.shadowRoot?.querySelector('#my-div');
+    if (div) {
+      await elementUpdated(div);
+    }
+
+    expect(div?.className).toContain('new-task');
+    expect(div?.className).not.toContain('green');
+    expect(div?.className).not.toContain('border');
+    
+    fire('main-state-update', {
+      task: {
+        isDone: true,
+        isNew: false,
+        task: 'Buy milk'
+      }
+    });
+    
+    if (div) {
+      await elementUpdated(div);
+    }
+    
+    expect(div?.className).not.toContain('new-task');
+    expect(div?.className).toContain('green');
+    expect(div?.className).toContain('border');
+  });
 });
