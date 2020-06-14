@@ -14,7 +14,6 @@ const registerState = (stateName: string) => (StateClass: any) => {
   const getters: any = observable.box([]);
   
   autorun(() => {
-    console.log('getters', Array.from(getters.get()));
     let data = getters.get().length ? {} : state;
     getters.get().forEach((property: string) => {
       const value = get(state, property);

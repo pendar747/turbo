@@ -19,17 +19,20 @@ const getEventDescriptions = (attributeValue: string): EventDesc[] => {
 
 const registeredElements = new Map<Element, Map<string, { domEvent: string, handler: (e: Event) => any }>>();
 
-const applyDescs = ({ el, eventDescs, data }: { el: Element, eventDescs: EventDesc[], data: any }) => {
+const applyDescs = ({ el, eventDescs, data, stateName }: { el: Element, eventDescs: EventDesc[], data: any, stateName: string }) => {
   eventDescs.forEach((desc) => {
     const { domEvent, userEvent } = desc;
     const handler = (e: Event) => {
-      const elementData = (e.target as HTMLElement).dataset ?? {};
-      const allData = { ...data, ...elementData };
+      const elementData = Object.assign({}, (e.target as HTMLElement).dataset) ?? {};
       const value = (e.target as HTMLInputElement).value;
       if (value) {
-        allData.value = value;
+        elementData.value = value;
       }
-      fire(userEvent, allData);
+      fire(`${stateName}-action`, {
+        data: elementData,
+        actionName: userEvent,
+        model: data.model
+      });
     }
     if (registeredElements.has(el)) { // if element is already registered
       // if element has the given user event registered but it's assigned to a different dom event
@@ -64,18 +67,19 @@ const removeUnassignedDescs = ({ el, eventDescs }: { el: Element, eventDescs: Ev
   });
 }
 
-const applyActions = (addedElements: Element[], data: any) => {
+const applyActions = (addedElements: Element[], stateName: string, data: any) => {
   const elements = uniq([
     ...addedElements,
     ...registeredElements.keys()
   ]);
 
-  const eventDescsForAll: { el: Element, eventDescs: EventDesc[], data: any }[] = elements.map((el) => {
+  const eventDescsForAll: { el: Element, eventDescs: EventDesc[], data: any, stateName: string }[] = elements.map((el) => {
     const action = el.getAttribute('tb-action');
     return {
       eventDescs: getEventDescriptions(action ?? ''),
       el,
-      data
+      data,
+      stateName
     }
   });
 
@@ -83,17 +87,24 @@ const applyActions = (addedElements: Element[], data: any) => {
   eventDescsForAll.forEach(applyDescs);
 }
 
-const observeActions = (targetNode: Element|Document|ShadowRoot, data: any = null): MutationObserver => {
+const observeActions = (targetNode: Element|Document|ShadowRoot, stateName: string, data: any = null): MutationObserver => {
   const observer = new MutationObserver((mutationsList, observer) => {
     for (let mutation of mutationsList) {
-      const elements: Element[] = Array.from(mutation.addedNodes)
-        .filter(el => el.nodeType == Node.ELEMENT_NODE)
+      let elements = Array.from(mutation.addedNodes)
+        .filter(element => element.nodeType == Node.ELEMENT_NODE 
+            && (element as Element).hasAttribute('tb-action')) as Element[];
+
+      const nestedElements = Array.from(mutation.addedNodes)
+        .filter(el => el.nodeType === Node.ELEMENT_NODE)
         .map(el => Array.from((el as Element).querySelectorAll('[tb-action]')))
         .flat();
+      
+      elements = [...elements, ...nestedElements];
+
       if (mutation.type === 'childList' && elements.length > 0) {
-        applyActions(elements, data);
+        applyActions(elements, stateName, data);
       } else if (mutation.type === 'attributes' && mutation.attributeName === 'tb-action') {
-        applyActions(elements, data);
+        applyActions(elements, stateName, data);
       }
     }
   });

@@ -37,20 +37,12 @@ export default class Render extends TurboComponent {
     })
   }
 
-  constructor () {
-    super();
-    if (this.shadowRoot) {
-      this.actionObserver = observeActions(this.shadowRoot, { model: this.model });
-      this.classObserver = new ClassObserver(this.shadowRoot, this.value);
-    }
-  }
-
   attributeChangedCallback (name: string, old: string, value: string) {
     super.attributeChangedCallback(name, old, value);
     if (name === 'model') {
       this.actionObserver?.disconnect();
-      if (this.shadowRoot) {
-        this.actionObserver = observeActions(this.shadowRoot, { model: this.model })
+      if (this.shadowRoot && this.stateName) {
+        this.actionObserver = observeActions(this.shadowRoot, this.stateName, { model: this.model })
       }
     }
   }
@@ -62,6 +54,10 @@ export default class Render extends TurboComponent {
 
   connectedCallback () {
     super.connectedCallback();
+    if (this.shadowRoot && this.stateName) {
+      this.actionObserver = observeActions(this.shadowRoot, this.stateName, { model: this.model });
+      this.classObserver = new ClassObserver(this.shadowRoot, this.value);
+    }
     const { render, getters } = parseTemplate(this.templateContent);
     this.renderContent = render;
     // todo give this more thought

@@ -76,7 +76,6 @@ class Form extends TurboComponent {
     const getters = Object.keys(this.values);
     // todo give this more thought
     // state needs to run before dispatching getters
-    console.log('form getters', getters)
     const dispatchGetters = () => {
       if (this.stateName) {
         const gettersWithFullPath = getters.map(getter => `${this.fullModelPath}.${getter}`);
