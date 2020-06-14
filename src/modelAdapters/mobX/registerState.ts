@@ -12,11 +12,11 @@ const registerState = (stateName: string) => (StateClass: any) => {
   const getters: any = observable.box([]);
   
   autorun(() => {
-    let data = getters.get().length ? {} : toJS(state);
+    let data = getters.get().length ? {} : state;
     getters.get().forEach((property: string) => {
-      const value = toJS(get(state, property));
+      const value = get(state, property);
       if (has(data, property)) {
-        set(data, property, merge(value, get(data, property)));
+        set(data, property, merge(value, get(state, property)));
       } else {
         set(data, property, value)
       }
@@ -24,7 +24,7 @@ const registerState = (stateName: string) => (StateClass: any) => {
     postMessage({
       type: 'state-update',
       stateName,
-      data
+      data: toJS(data, { recurseEverything: true })
     } as MessageData);
   });
 
@@ -40,7 +40,9 @@ const registerState = (stateName: string) => (StateClass: any) => {
     if (type == 'getters-update') {
       const newGetters = (data as string[])
         .filter(getter => !getters.get().includes(getter))
-      getters.set([...getters.get(), ...newGetters]);
+      if (newGetters.length) {
+        getters.set([...getters.get(), ...newGetters]);
+      }
     }
   }
 }

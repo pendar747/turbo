@@ -5,7 +5,7 @@ import './Form';
 describe('tb-form', () => {
 
   it('should set the form values with data from the model', async () => {
-    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+    sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
     const parent = await fixture(`<div state="main"></div>`);
     const el = await fixture(`<tb-form model="profile" submitEvent="updateName">
       <input name="name" />
@@ -20,7 +20,7 @@ describe('tb-form', () => {
   });
   
   it('should update the form values when the model changes', async () => {
-    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+    sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
     const parent = await fixture(`<div state="main"></div>`);
     const el = await fixture(`<tb-form model="profile" submitEvent="updateName">
       <input name="name" />
@@ -34,7 +34,7 @@ describe('tb-form', () => {
         city: 'London'
       }
     }
-    localStorage.setItem('main', JSON.stringify(newState));
+    sessionStorage.setItem('main', JSON.stringify(newState));
     fire('main-state-update', newState);
 
     await elementUpdated(el);
@@ -45,7 +45,7 @@ describe('tb-form', () => {
   });
   
   it('should dispatch a submit event with all the current form data when the form is submitted', async () => {
-    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+    sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
     const parent = await fixture(`<div state="main"></div>`);
     const el = await fixture(`<tb-form model="profile" submitEvent="updateName">
       <input name="name" />
@@ -71,7 +71,7 @@ describe('tb-form', () => {
   });
 
   it('should dispatch a submit event with the updated value of the input elements when the form is submitted', async () => {
-    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+    sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
     const parent = await fixture(`<div state="main"></div>`);
     const el = await fixture(`<tb-form model="profile" submitEvent="updateName">
       <input name="name" />
@@ -104,7 +104,7 @@ describe('tb-form', () => {
   });
   
   it('should dispatch a change event with the updated value of the input elements when the input elements are changed', async () => {
-    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+    sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
     const parent = await fixture(`<div state="main"></div>`);
     const el = await fixture(`<tb-form model="profile" changeEvent="updateDraft">
       <input name="name" />
@@ -136,7 +136,7 @@ describe('tb-form', () => {
   });
   
   it('should not fire the old event when submitEvent property changes', async () => {
-    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+    sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
     const parent = await fixture(`<div state="main"></div>`);
     const el = await fixture(`<tb-form model="profile" submitEvent="updateProfile">
       <input name="name" />
@@ -161,7 +161,7 @@ describe('tb-form', () => {
   });
   
   it('should not fire the old event when changeEvent property changes', async () => {
-    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+    sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
     const parent = await fixture(`<div state="main"></div>`);
     const el = await fixture(`<tb-form model="profile" changeEvent="updateDraft">
       <input name="name" />

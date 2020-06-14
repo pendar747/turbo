@@ -9,8 +9,9 @@ const runState = (worker: Worker, stateName: string): Worker => {
   worker.onmessage = (event) => {
     const data: MessageData = event.data;
     if (data.type == 'state-update') {
-      localStorage.setItem(stateName, JSON.stringify(data.data));
-      fire('state-update', {
+      sessionStorage.setItem(stateName, JSON.stringify(data.data));
+      console.log('state update', data.data);
+      fire(`${stateName}-state-update`, {
         stateName,
         state: data.data
       });
@@ -26,7 +27,7 @@ const runState = (worker: Worker, stateName: string): Worker => {
     worker.postMessage(messageData);
   });
 
-  on('action', (event) => {
+  on(`${stateName}-action`, (event) => {
     const messageData: MessageData = {
       stateName,
       type: 'action',
@@ -36,6 +37,8 @@ const runState = (worker: Worker, stateName: string): Worker => {
     }
     worker.postMessage(messageData);
   });
+
+  fire(`${stateName}-state-started`);
 
   return worker;
 }

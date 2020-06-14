@@ -31,7 +31,7 @@ export default class Page extends LitElement {
   }
 
   get pageUrl (): string|undefined {
-    const pageUrlMaps: PageUrlMap[] = JSON.parse(localStorage.getItem('page-url-maps') || '[]');
+    const pageUrlMaps: PageUrlMap[] = JSON.parse(sessionStorage.getItem('page-url-maps') || '[]');
     const pageUrlMap = pageUrlMaps.find(({ pattern }) => {
       const regex = pathToRegexp(pattern);
       return regex.test(this.pagePath);
@@ -75,6 +75,6 @@ export default class Page extends LitElement {
   }
 
   render () {
-    return html`${this.templateContent}`;
+    return html`<div .innerHTML="${this.templateContent}"></div>`;
   }
 }

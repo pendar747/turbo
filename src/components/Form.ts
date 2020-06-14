@@ -12,9 +12,14 @@ class Form extends TurboComponent {
   public changeEvent: string|undefined;
 
   private handlersMap = new Map<Element, (event: Event) => void>();
+  private submitHandlersMap = new Map<Element, (event: Event) => void>();
 
   get inputElements (): HTMLInputElement[] {
     return Array.from(this.querySelectorAll('input'));
+  }
+
+  get submitInputElements (): Element[] {
+    return Array.from(this.querySelectorAll('[type="submit"]'));
   }
   
   get values (): { [key in string]: string } {
@@ -33,7 +38,11 @@ class Form extends TurboComponent {
   handleSubmit (event: Event) {
     event.preventDefault();
     if (this.submitEvent) {
-      fire(this.submitEvent, this.updateData);
+      fire(`${this.stateName}-action`, {
+        actionName: this.submitEvent,
+        data: this.values,
+        model: this.model
+      });
     }
   }
 
@@ -55,6 +64,13 @@ class Form extends TurboComponent {
   }
 
   render () {
+    this.submitInputElements.forEach((element) => {
+      if (!this.submitHandlersMap.has(element)) {
+        const handler = this.handleSubmit.bind(this);
+        element.addEventListener('click', handler);
+        this.submitHandlersMap.set(element, handler);
+      }
+    });
     this.inputElements.forEach(el => {
       if (this.value) {
         el.value = this.value[el.name];

@@ -10,7 +10,7 @@ describe('Render', () => {
     beforeAll( async () => {
       eventHandler = jasmine.createSpy();
       on('main-add-getters', eventHandler);
-      localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+      sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
       await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
       const parent = await fixture(`<div state="main"></div>`);
       el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
@@ -30,7 +30,7 @@ describe('Render', () => {
   });
   
   it('should update when state changes', async () => {
-    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+    sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
     await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
     const parent = await fixture(`<div state="main"></div>`);
     const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
@@ -58,7 +58,7 @@ describe('Render', () => {
           city: 'Bangalore'
         }]
       };
-      localStorage.setItem('list', JSON.stringify(state));
+      sessionStorage.setItem('list', JSON.stringify(state));
       await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
       const parent = await fixture(`<div state="list"></div>`);
       el = await fixture(`<tb-render template="my-template" model="profiles"></tb-render>`, { parentNode: parent });
@@ -140,7 +140,7 @@ describe('Render', () => {
           city: 'Vienna'
         }]
       };
-      localStorage.setItem('list', JSON.stringify(newState));
+      sessionStorage.setItem('list', JSON.stringify(newState));
       fire('list-state-update', newState);
 
       await elementUpdated(el);
@@ -154,7 +154,7 @@ describe('Render', () => {
 
   
   it('should fire an event for the given model', async () => {
-    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+    sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
     await fixture('<template id="my-template"><button tb-action="click:click-me" id="my-button">click me</button></template>')
     const parent = await fixture(`<div state="main"></div>`);
     const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
@@ -171,7 +171,7 @@ describe('Render', () => {
   });
   
   it('should fire an event for the given model with the data that is attached to the element', async () => {
-    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+    sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
     await fixture('<template id="my-template"><button data-name="{name}" tb-action="click:click-me" id="my-button">click me</button></template>')
     const parent = await fixture(`<div state="main"></div>`);
     const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
@@ -186,7 +186,7 @@ describe('Render', () => {
   });
   
   it('should update the model and render with the fired event', async () => {
-    localStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
+    sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
     await fixture('<template id="my-template"><span>{name}</span><input tb-action="keyup:setName" id="my-input" /></template>')
     const parent = await fixture(`<div state="main"></div>`);
     const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
@@ -197,7 +197,7 @@ describe('Render', () => {
           city: 'New York'
         }
       }
-      localStorage.setItem('list', JSON.stringify(newState));
+      sessionStorage.setItem('list', JSON.stringify(newState));
       fire('main-state-update', newState);
     });
     (el.shadowRoot?.getElementById('my-input') as HTMLInputElement).value = 'David';
@@ -209,7 +209,7 @@ describe('Render', () => {
   });
 
   it('should render with context', async () => {
-    localStorage.setItem('main', JSON.stringify(
+    sessionStorage.setItem('main', JSON.stringify(
       { 
         profile: { 
           name: 'Mike', city: 'New York',
@@ -236,7 +236,7 @@ describe('Render', () => {
 
   
   it('should render nested templates', async () => {
-    localStorage.setItem('main', JSON.stringify(
+    sessionStorage.setItem('main', JSON.stringify(
       { 
         profile: { 
           name: 'Mike', city: 'New York',
@@ -270,7 +270,7 @@ describe('Render', () => {
   });
   
   it('should render nested list templates', async () => {
-    localStorage.setItem('main', JSON.stringify(
+    sessionStorage.setItem('main', JSON.stringify(
       { 
         profile: [{ 
           name: 'Mike',
@@ -303,7 +303,7 @@ describe('Render', () => {
 
    
   it('should render without context when no-context attribute is added', async () => {
-    localStorage.setItem('main', JSON.stringify(
+    sessionStorage.setItem('main', JSON.stringify(
       { 
         mainCity: {
           name: 'Los Angeles',
@@ -339,7 +339,7 @@ describe('Render', () => {
   });
 
   it('should assign classes with tb-class when a condition is true', async () => {
-    localStorage.setItem('main', JSON.stringify({
+    sessionStorage.setItem('main', JSON.stringify({
       task: {
         isDone: false,
         isNew: true,

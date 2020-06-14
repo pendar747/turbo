@@ -2,7 +2,7 @@ import { customElement, html, property } from "lit-element";
 import TurboComponent from "./TurboComponent";
 import parseTemplate from "./parseTemplate";
 import observeActions from "./observeActions";
-import { fire } from "../util";
+import { fire, on } from "../util";
 import ClassObserver from "./ClassObserver";
 
 @customElement('tb-render')
@@ -27,6 +27,9 @@ export default class Render extends TurboComponent {
   
   renderElements () {
     if (!this.value) {
+      return;
+    }
+    if (!this.value.length) {
       return;
     }
     return this.value.map((valueItem: any, index: number) => {
@@ -61,12 +64,18 @@ export default class Render extends TurboComponent {
     super.connectedCallback();
     const { render, getters } = parseTemplate(this.templateContent);
     this.renderContent = render;
-    if (!Array.isArray(this.value) && this.stateName) {
-      fire(`${this.stateName}-add-getters`, {
-        model: this.model,
-        getters
-      });
+    // todo give this more thought
+    // state needs to run before dispatching getters
+    const dispatchGetters = () => {
+      if (this.stateName) {
+        const gettersWithFullPath = getters.map(getter => `${this.fullModelPath}.${getter}`);
+        fire(`${this.stateName}-add-getters`, [...gettersWithFullPath, this.fullModelPath]);
+      }
     }
+    on(`${this.stateName}-state-started`, () => {
+      dispatchGetters();
+    });
+    dispatchGetters();
   }
 
   updated (changedProps: any) {
@@ -79,6 +88,7 @@ export default class Render extends TurboComponent {
   }
 
   render () {
+    console.log('render', this, this.fullModelPath);
     if (this.classObserver) {
       this.classObserver.data = this.value;
     }

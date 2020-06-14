@@ -30,7 +30,7 @@ describe('mobXAdapter', () => {
     on('state-update', onStateUpdate);
 
     await waitUntil(() => onStateUpdate.calls.count() == 1);
-    expect(JSON.parse(localStorage.getItem('main') ?? '{}')).toEqual({
+    expect(JSON.parse(sessionStorage.getItem('main') ?? '{}')).toEqual({
       todos: []
     });
     expect(onStateUpdate.calls.argsFor(0)[0].detail).toEqual({
@@ -53,7 +53,7 @@ describe('mobXAdapter', () => {
 
     await waitUntil(() => onStateUpdate.calls.count() == 2);
 
-    expect(JSON.parse(localStorage.getItem('main') ?? '{}')).toEqual({
+    expect(JSON.parse(sessionStorage.getItem('main') ?? '{}')).toEqual({
       todos: [{ text: 'My todo' }]
     });
     expect(onStateUpdate.calls.argsFor(1)[0].detail).toEqual({
@@ -83,7 +83,7 @@ describe('mobXAdapter', () => {
 
     await waitUntil(() => onStateUpdate.calls.count() == 3);
 
-    expect(JSON.parse(localStorage.getItem('main') ?? '{}')).toEqual({
+    expect(JSON.parse(sessionStorage.getItem('main') ?? '{}')).toEqual({
       todos: [{ text: 'Something else' }]
     });
     expect(onStateUpdate.calls.argsFor(2)[0].detail).toEqual({
@@ -118,7 +118,7 @@ describe('mobXAdapter', () => {
       fire('main-add-getters', ['todos', 'allTodosSummary']);
       await waitUntil(() => onStateUpdate.calls.count() == 4);
 
-      expect(JSON.parse(localStorage.getItem('main') ?? '{}')).toEqual({
+      expect(JSON.parse(sessionStorage.getItem('main') ?? '{}')).toEqual({
         todos: [{ text: 'My todo' }, { text: 'Another todo' }],
         allTodosSummary: 'My todo, Another todo'
       });
@@ -135,7 +135,7 @@ describe('mobXAdapter', () => {
       fire('main-add-getters', ['todos[0].quotedText', 'todos', 'allTodosSummary']);
       await waitUntil(() => onStateUpdate.calls.count() == 4);
       
-      expect(JSON.parse(localStorage.getItem('main') ?? '{}')).toEqual({
+      expect(JSON.parse(sessionStorage.getItem('main') ?? '{}')).toEqual({
         todos: [{ text: 'My todo', quotedText: '"My todo"' }, { text: 'Another todo' }],
         allTodosSummary: 'My todo, Another todo'
       });
@@ -157,7 +157,7 @@ describe('mobXAdapter', () => {
         todos: [{ text: 'My todo', quotedText: '"My todo"' }, { text: 'Another todo', quotedText: '"Another todo"' }],
         allTodosSummary: 'My todo, Another todo'
       };
-      expect(JSON.parse(localStorage.getItem('main') ?? '{}')).toEqual(expectedState);
+      expect(JSON.parse(sessionStorage.getItem('main') ?? '{}')).toEqual(expectedState);
       expect(onStateUpdate.calls.argsFor(4)[0].detail).toEqual({
         stateName: 'main',
         state: expectedState

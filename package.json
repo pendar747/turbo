@@ -9,6 +9,7 @@
     "start": "static-server ./public",
     "test": "karma start karma.conf.js"
   },
+  "files": ["dist/**/*"],
   "dependencies": {
     "axios": "^0.19.2",
     "lodash-es": "^4.17.15",

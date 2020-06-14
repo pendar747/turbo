@@ -17,7 +17,7 @@ describe('Page', () => {
       </template>
     `);
     history.pushState({ page: 'page-2' }, 'Page 2', '/page-2');
-    const el = await fixture('<tb-page id="1"></tb-page>');
+    const el = await fixture('<tb-page></tb-page>');
 
     expect(el.shadowRoot?.textContent).toContain('Page 2');
     expect(el.shadowRoot?.textContent).toContain('content');
@@ -37,7 +37,7 @@ describe('Page', () => {
     `);
 
     history.pushState({ page: 'page-2' }, 'Page 2', '/page-2');
-    const el = await fixture('<tb-page id="2"></tb-page>');
+    const el = await fixture('<tb-page></tb-page>');
     
     expect(el.shadowRoot?.textContent).toContain('Page 2');
     expect(el.shadowRoot?.textContent).toContain('content');
@@ -135,7 +135,7 @@ describe('Page', () => {
       }
     }
 
-    localStorage.setItem('page-url-maps', JSON.stringify([{
+    sessionStorage.setItem('page-url-maps', JSON.stringify([{
       pattern: '/page-6/:id/page-3',
       page: '/page-6/page-3.html'
     }]));
@@ -175,7 +175,7 @@ describe('Page', () => {
       }
     }
 
-    localStorage.setItem('page-url-maps', JSON.stringify([{
+    sessionStorage.setItem('page-url-maps', JSON.stringify([{
       pattern: '/page-6/:id/page-3',
       page: '/page-6/page-3.html'
     }, {
@@ -213,7 +213,7 @@ describe('Page', () => {
       }
     } as any);
 
-    localStorage.setItem('page-url-maps', JSON.stringify([{
+    sessionStorage.setItem('page-url-maps', JSON.stringify([{
       pattern: '/page-6/:id/page-3',
       page: '/page-6/page-3.html'
     }, {
