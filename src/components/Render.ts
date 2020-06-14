@@ -68,7 +68,7 @@ export default class Render extends TurboComponent {
     // state needs to run before dispatching getters
     const dispatchGetters = () => {
       if (this.stateName) {
-        const gettersWithFullPath = getters.map(getter => `${this.fullModelPath}.${getter}`);
+        const gettersWithFullPath = Array.isArray(this.value) ? [] : getters.map(getter => `${this.fullModelPath}.${getter}`);
         fire(`${this.stateName}-add-getters`, [...gettersWithFullPath, this.fullModelPath]);
       }
     }
@@ -88,7 +88,6 @@ export default class Render extends TurboComponent {
   }
 
   render () {
-    console.log('render', this, this.fullModelPath);
     if (this.classObserver) {
       this.classObserver.data = this.value;
     }
