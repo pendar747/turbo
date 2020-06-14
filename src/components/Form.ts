@@ -49,7 +49,7 @@ class Form extends TurboComponent {
       fire(`${this.stateName}-action`, {
         actionName: this.submitEvent,
         data: this.values,
-        model: this.model
+        model: this.fullModelPath
       });
     }
   }

@@ -19,7 +19,9 @@ export default abstract class TurboComponent extends LitElement {
   };
 
   protected get fullModelPath () {
-    return this.context ? `${this.context}.${this.model}` : (this.model ?? '');
+    return this.context 
+      ? this.model ? `${this.context}.${this.model}` : this.context
+      : (this.model ?? '');
   }
   
   protected get stateName () {

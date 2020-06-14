@@ -75,7 +75,11 @@ export default class Render extends TurboComponent {
   }
 
   updated (changedProps: any) {
-    this.shadowRoot?.querySelectorAll('tb-render').forEach(el => {
+    const renderElements = [
+      ...Array.from(this.shadowRoot?.querySelectorAll('tb-render') ?? []),
+      ...Array.from(this.shadowRoot?.querySelectorAll('tb-form') ?? [])
+    ];
+    renderElements.forEach(el => {
       if (this.model && !el.hasAttribute('context') && !el.hasAttribute('no-context')) {
         el.setAttribute('context', this.model);
       }
