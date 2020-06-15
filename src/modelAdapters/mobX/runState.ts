@@ -10,7 +10,6 @@ const runState = (worker: Worker, stateName: string): Worker => {
     const data: MessageData = event.data;
     if (data.type == 'state-update') {
       sessionStorage.setItem(stateName, JSON.stringify(data.data));
-      console.log('state update', data.data);
       fire(`${stateName}-state-update`, {
         stateName,
         state: data.data

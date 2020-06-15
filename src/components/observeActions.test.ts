@@ -6,7 +6,7 @@ describe('tb-action attribute', () => {
 
   let observer: MutationObserver;
   beforeEach(() => {
-    observer = observeActions(document.body);
+    observer = observeActions(document.body, 'main');
   });
 
   afterEach(() => {
@@ -15,7 +15,7 @@ describe('tb-action attribute', () => {
 
   it('should fire the event bound to the element', async () => {
     const callback = jasmine.createSpy();
-    on('my-event', callback);
+    on('main-action', callback);
     const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event">click</button>`);
     el.dispatchEvent(new MouseEvent('click'));
 
@@ -95,7 +95,7 @@ describe('tb-action attribute', () => {
 
   it('should fire an event with data that is assigned to observeActions the beginning', async () => {
     observer.disconnect();
-    observer = observeActions(document.body, { model: 'my-model' });
+    observer = observeActions(document.body, 'main', { model: 'my-model' });
     
     const myEventCallback = jasmine.createSpy();
     on('my-event-3', myEventCallback);
@@ -109,7 +109,7 @@ describe('tb-action attribute', () => {
   
   it('should fire multiple events with data that is assigned to observeActions the beginning', async () => {
     observer.disconnect();
-    observer = observeActions(document.body, { model: 'my-model' });
+    observer = observeActions(document.body, 'main', { model: 'my-model' });
     
     const myEventCallback = jasmine.createSpy();
     const mouseOverCallback = jasmine.createSpy();
@@ -129,7 +129,7 @@ describe('tb-action attribute', () => {
 
   it('should also include the data that is attached to the element target itself', async () => {
     observer.disconnect();
-    observer = observeActions(document.body, { model: 'my-model' });
+    observer = observeActions(document.body, 'main', { model: 'my-model' });
     
     const myEventCallback = jasmine.createSpy();
     on('my-event-3', myEventCallback);
@@ -143,7 +143,7 @@ describe('tb-action attribute', () => {
   
   it('should override the observer data with the element data if the property names clash', async () => {
     observer.disconnect();
-    observer = observeActions(document.body, { model: 'my-model' });
+    observer = observeActions(document.body, 'main', { model: 'my-model' });
     
     const myEventCallback = jasmine.createSpy();
     on('my-event-3', myEventCallback);
@@ -157,7 +157,7 @@ describe('tb-action attribute', () => {
   
   it('should fire multiple events with the element data that is assigned to observeActions the beginning', async () => {
     observer.disconnect();
-    observer = observeActions(document.body, { model: 'my-model' });
+    observer = observeActions(document.body, 'main', { model: 'my-model' });
     
     const myEventCallback = jasmine.createSpy();
     const mouseOverCallback = jasmine.createSpy();
@@ -177,7 +177,7 @@ describe('tb-action attribute', () => {
   
   it('should also include value of the target element in event data', async () => {
     observer.disconnect();
-    observer = observeActions(document.body, { model: 'my-model' });
+    observer = observeActions(document.body, 'main', { model: 'my-model' });
     
     const myEventCallback = jasmine.createSpy();
     on('my-event-3', myEventCallback);

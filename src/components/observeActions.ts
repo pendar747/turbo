@@ -40,7 +40,6 @@ const applyDescs = ({ el, eventDescs, data, stateName }: { el: Element, eventDes
       if (registeredElements.get(el)?.get(userEvent)?.domEvent !== domEvent) { 
         el.addEventListener(domEvent, handler);
         registeredElements.get(el)?.set(userEvent, { domEvent, handler });
-        // console.log('apply', { userEvent, domEvent });
       }
     // if the element is not registered at all then apply this event description
     } else {

@@ -5,7 +5,7 @@
     "lib": ["ES2016", "DOM", "ESNext", "WebWorker"],
     "declaration": true,                   
     "declarationMap": true,                
-    "sourceMap": true,                     
+    "inlineSourceMap": true,
     "moduleResolution": "Node",
     "outDir": "./dist",            
     "rootDir": "./src",                       

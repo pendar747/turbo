@@ -26,8 +26,20 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      { pattern: "dist/**/*.test.js", watched: false, type: "module" }
+      { 
+        pattern: "dist/**/*.test.js", 
+        watched: false, 
+        type: "module" 
+      },
+      {
+        pattern: 'dist/**/*.js.map',
+        included: false
+      } 
     ],
+
+    preprocessors: {
+      'dist/**/*.js': ['sourcemap']
+    },
 
 
     // list of files / patterns to exclude
