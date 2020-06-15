@@ -9,6 +9,10 @@ describe('Page', () => {
     document.querySelectorAll('tb-page').forEach(el => el.remove());
   });
 
+  afterEach(() => {
+    history.replaceState({}, '/', '/');
+  });
+
   it('should render the content of the template with the same id as the page path', async () => {
     await fixture(`
       <template page-path="/page-2">
