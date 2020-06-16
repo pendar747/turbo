@@ -22,10 +22,7 @@ describe('Render', () => {
 
     it('should dispatch an event that specifies the getters', () => {
       expect(eventHandler).toHaveBeenCalledTimes(1);
-      expect(eventHandler.calls.argsFor(0)[0].detail).toEqual({
-        model: 'profile',
-        getters: ['name', 'city']
-      });
+      expect(eventHandler.calls.argsFor(0)[0].detail).toEqual(['profile.name', 'profile.city', 'profile']);
     });
   });
   
@@ -36,7 +33,7 @@ describe('Render', () => {
     const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
 
     expect(el.shadowRoot?.textContent).toEqual('My name is Mike and I live in New York.');
-    fire('main-state-update', { profile: { name: 'Mike', city: 'Tokyo' } });
+    fire('main-state-update', { state: { profile: { name: 'Mike', city: 'Tokyo' } } });
     expect(el.shadowRoot?.textContent).toEqual('My name is Mike and I live in Tokyo.');
   });
 
@@ -74,34 +71,28 @@ describe('Render', () => {
         .toEqual('My name is Raj and I live in Bangalore.');
     });
 
-    it('should dispatch getters for each item', () => {
-      expect(eventHandler).toHaveBeenCalledTimes(3);
-      expect(eventHandler.calls.argsFor(0)[0].detail).toEqual({
-        model: 'profiles[0]',
-        getters: ['name', 'city']
-      });
-      expect(eventHandler.calls.argsFor(1)[0].detail).toEqual({
-        model: 'profiles[1]',
-        getters: ['name', 'city']
-      });
-      expect(eventHandler.calls.argsFor(2)[0].detail).toEqual({
-        model: 'profiles[2]',
-        getters: ['name', 'city']
-      });
+    it('should dispatch getters for each item and the model', () => {
+      expect(eventHandler).toHaveBeenCalledTimes(4);
+      expect(eventHandler.calls.argsFor(0)[0].detail).toEqual(['profiles[0].name', 'profiles[0].city', 'profiles[0]']);
+      expect(eventHandler.calls.argsFor(1)[0].detail).toEqual(['profiles[1].name', 'profiles[1].city', 'profiles[1]']);
+      expect(eventHandler.calls.argsFor(2)[0].detail).toEqual(['profiles[2].name', 'profiles[2].city', 'profiles[2]']);
+      expect(eventHandler.calls.argsFor(3)[0].detail).toEqual(['profiles']);
     });
     
     it('should update the rendered list when an item in the list is updated', async () => {
       fire('list-state-update', {
-        profiles: [{
-          name: 'Mike',
-          city: 'New York'
-        }, {
-          name: 'Bumpzy',
-          city: 'Greenwich'
-        }, {
-          name: 'Raj',
-          city: 'Bangalore'
-        }]
+        state: {
+          profiles: [{
+            name: 'Mike',
+            city: 'New York'
+          }, {
+            name: 'Bumpzy',
+            city: 'Greenwich'
+          }, {
+            name: 'Raj',
+            city: 'Bangalore'
+          }]
+        }
       });
       
       expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
@@ -110,13 +101,15 @@ describe('Render', () => {
     
     it('should update the rendered list when an item removed', async () => {
       fire('list-state-update', {
-        profiles: [{
-          name: 'Mike',
-          city: 'New York'
-        }, {
-          name: 'Raj',
-          city: 'Bangalore'
-        }]
+        state: {
+          profiles: [{
+            name: 'Mike',
+            city: 'New York'
+          }, {
+            name: 'Raj',
+            city: 'Bangalore'
+          }]
+        }
       });
 
       expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(2);
@@ -141,7 +134,7 @@ describe('Render', () => {
         }]
       };
       sessionStorage.setItem('list', JSON.stringify(newState));
-      fire('list-state-update', newState);
+      fire('list-state-update', { state: newState });
 
       await elementUpdated(el);
       
@@ -162,12 +155,15 @@ describe('Render', () => {
     expect(el.shadowRoot?.innerHTML).toEqual('<!----><div id="container"><button tb-action="click:click-me" id="my-button">click me</button></div><!---->');
 
     const myEventCallback = jasmine.createSpy();
-    on('click-me', myEventCallback);
+    on('main-action', myEventCallback);
     el.shadowRoot?.getElementById('my-button')?.dispatchEvent(new MouseEvent('click'));
     
     expect(myEventCallback.calls.count()).toEqual(1);
-    expect(myEventCallback.calls.argsFor(0)[0]).toBeInstanceOf(CustomEvent);
-    expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({ model: 'profile' });
+    expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({ 
+      model: 'profile',
+      actionName: 'click-me',
+      data: {}
+    });
   });
   
   it('should fire an event for the given model with the data that is attached to the element', async () => {
@@ -177,12 +173,17 @@ describe('Render', () => {
     const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
 
     const myEventCallback = jasmine.createSpy();
-    on('click-me', myEventCallback);
+    on('main-action', myEventCallback);
     el.shadowRoot?.getElementById('my-button')?.dispatchEvent(new MouseEvent('click'));
     
     expect(myEventCallback.calls.count()).toEqual(1);
-    expect(myEventCallback.calls.argsFor(0)[0]).toBeInstanceOf(CustomEvent);
-    expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({ model: 'profile', name: 'Mike' });
+    expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({ 
+      model: 'profile', 
+      data: {
+        name: 'Mike',
+      },
+      actionName: 'click-me'
+    });
   });
   
   it('should update the model and render with the fired event', async () => {
@@ -190,15 +191,15 @@ describe('Render', () => {
     await fixture('<template id="my-template"><span>{name}</span><input tb-action="keyup:setName" id="my-input" /></template>')
     const parent = await fixture(`<div state="main"></div>`);
     const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
-    on('setName', (event) => {
+    on('main-action', (event) => {
       const newState = {
         profile: {
-          name: event.detail.value,
+          name: event.detail.data.value,
           city: 'New York'
         }
       }
-      sessionStorage.setItem('list', JSON.stringify(newState));
-      fire('main-state-update', newState);
+      sessionStorage.setItem('main', JSON.stringify(newState));
+      fire('main-state-update', { state: newState });
     });
     (el.shadowRoot?.getElementById('my-input') as HTMLInputElement).value = 'David';
     el.shadowRoot?.getElementById('my-input')?.dispatchEvent(new KeyboardEvent('keyup'));
@@ -373,10 +374,12 @@ describe('Render', () => {
     expect(div?.className).not.toContain('border');
     
     fire('main-state-update', {
-      task: {
-        isDone: true,
-        isNew: false,
-        task: 'Buy milk'
+      state: {
+        task: {
+          isDone: true,
+          isNew: false,
+          task: 'Buy milk'
+        }
       }
     });
     
