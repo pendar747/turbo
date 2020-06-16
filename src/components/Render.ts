@@ -42,7 +42,7 @@ export default class Render extends TurboComponent {
     if (name === 'model') {
       this.actionObserver?.disconnect();
       if (this.shadowRoot && this.stateName) {
-        this.actionObserver = observeActions(this.shadowRoot, this.stateName, { model: this.model })
+        this.actionObserver = observeActions(this.shadowRoot, this.stateName, this.model ?? undefined)
       }
     }
   }
@@ -55,7 +55,7 @@ export default class Render extends TurboComponent {
   connectedCallback () {
     super.connectedCallback();
     if (this.shadowRoot && this.stateName) {
-      this.actionObserver = observeActions(this.shadowRoot, this.stateName, { model: this.model });
+      this.actionObserver = observeActions(this.shadowRoot, this.stateName, this.model ?? undefined);
       this.classObserver = new ClassObserver(this.shadowRoot, this.value);
     }
     const { render, getters } = parseTemplate(this.templateContent);
