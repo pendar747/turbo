@@ -27,7 +27,7 @@ describe('mobXAdapter', () => {
 
   it('should fire an initial state update', async () => {
     const onStateUpdate = jasmine.createSpy();
-    on('state-update', onStateUpdate);
+    on('main-state-update', onStateUpdate);
 
     await waitUntil(() => onStateUpdate.calls.count() == 1);
     expect(JSON.parse(sessionStorage.getItem('main') ?? '{}')).toEqual({
@@ -43,8 +43,8 @@ describe('mobXAdapter', () => {
 
   it('should start a mobX state in a webworker', async () => {
     const onStateUpdate = jasmine.createSpy();
-    on('state-update', onStateUpdate);
-    fire('action', {
+    on('main-state-update', onStateUpdate);
+    fire('main-action', {
       actionName: 'addTodo',
       data: {
         text: 'My todo'
@@ -66,14 +66,14 @@ describe('mobXAdapter', () => {
 
   it('should update a model in the state', async () => {
     const onStateUpdate = jasmine.createSpy();
-    on('state-update', onStateUpdate);
-    fire('action', {
+    on('main-state-update', onStateUpdate);
+    fire('main-action', {
       actionName: 'addTodo',
       data: {
         text: 'My todo'
       }
     });
-    fire('action', {
+    fire('main-action', {
       model: 'todos[0]',
       actionName: 'edit',
       data: {
@@ -99,14 +99,14 @@ describe('mobXAdapter', () => {
     let onStateUpdate: jasmine.Spy;
     beforeEach( async () => {
       onStateUpdate = jasmine.createSpy();
-      on('state-update', onStateUpdate);
-      fire('action', {
+      on('main-state-update', onStateUpdate);
+      fire('main-action', {
         actionName: 'addTodo',
         data: {
           text: 'My todo'
         }
       });
-      fire('action', {
+      fire('main-action', {
         actionName: 'addTodo',
         data: {
           text: 'Another todo'
