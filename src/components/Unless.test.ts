@@ -26,7 +26,7 @@ describe('tb-unless', () => {
     
     expect(el.shadowRoot?.querySelectorAll('slot')?.length).toEqual(1);
 
-    fire('main-state-update', { name: 'Pete' });
+    fire('main-state-update', { state: { name: 'Pete' }});
     expect(el.shadowRoot?.querySelectorAll('slot')?.length).toEqual(0);
   });
 });

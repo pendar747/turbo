@@ -27,7 +27,7 @@ describe('tb-if', () => {
     
     expect(el.shadowRoot?.querySelectorAll('slot')?.length).toEqual(0);
 
-    fire('main-state-update', { name: 'Pete' });
+    fire('main-state-update', { state: { name: 'Pete' }});
     expect(el.shadowRoot?.querySelectorAll('slot')?.length).toEqual(1);
   });
 });
