@@ -16,6 +16,8 @@ export default class Render extends TurboComponent {
   @property()
   unless: string|null = null;
 
+  getters: string[] = [];
+
   renderContent: ((data: any) => string)|undefined;
 
   private actionObserver: MutationObserver|undefined;
@@ -39,17 +41,28 @@ export default class Render extends TurboComponent {
 
   attributeChangedCallback (name: string, old: string, value: string) {
     super.attributeChangedCallback(name, old, value);
-    if (name === 'model') {
+    if (name === 'model' || name === 'context') {
       this.actionObserver?.disconnect();
       if (this.shadowRoot && this.stateName) {
         this.actionObserver = observeActions(this.shadowRoot, this.stateName, this.model ?? undefined)
       }
+      this.dispatchGetters();
     }
   }
 
   disconnectedCallback () {
     this.actionObserver?.disconnect();
     this.classObserver?.disconnect();
+  }
+
+  dispatchGetters () {
+    if (this.stateName) {
+      const gettersWithFullPath = Array.isArray(this.value) ? [] : this.getters.map(getter => `${this.fullModelPath}.${getter}`);
+      const allGetters = [...gettersWithFullPath, this.fullModelPath];
+      if (allGetters.length) {
+        fire(`${this.stateName}-add-getters`, allGetters);
+      }
+    }
   }
 
   connectedCallback () {
@@ -60,18 +73,11 @@ export default class Render extends TurboComponent {
     }
     const { render, getters } = parseTemplate(this.templateContent);
     this.renderContent = render;
-    // todo give this more thought
-    // state needs to run before dispatching getters
-    const dispatchGetters = () => {
-      if (this.stateName) {
-        const gettersWithFullPath = Array.isArray(this.value) ? [] : getters.map(getter => `${this.fullModelPath}.${getter}`);
-        fire(`${this.stateName}-add-getters`, [...gettersWithFullPath, this.fullModelPath]);
-      }
-    }
+    this.getters = getters;
     on(`${this.stateName}-state-started`, () => {
-      dispatchGetters();
+      this.dispatchGetters();
     });
-    dispatchGetters();
+    this.dispatchGetters();
   }
 
   updated (changedProps: any) {

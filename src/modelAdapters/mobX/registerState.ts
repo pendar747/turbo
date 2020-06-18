@@ -1,9 +1,8 @@
-import { autorun, toJS, observable } from 'mobx';
+import { autorun, observable } from 'mobx';
 
 import get from 'lodash-es/get';
 import set from 'lodash-es/set';
 import mergeWith from 'lodash-es/mergeWith';
-import has from 'lodash-es/has';
 import { MessageData } from './types';
 
 const serialize = (obj: any) => JSON.parse(JSON.stringify(obj));
@@ -14,7 +13,7 @@ const mergeCustomizer = (obj1: any, obj2: any) => {
     const smallerArray = obj1.length > obj2.length ? obj2 : obj1;
     largerArray.map((item, index) => {
       if (smallerArray[index]) {
-        return mergeWith(item, smallerArray, mergeCustomizer);
+        return mergeWith(item, smallerArray[index], mergeCustomizer);
       }
       return item;
     });
@@ -29,15 +28,16 @@ const registerState = (stateName: string) => (StateClass: any) => {
   
   autorun(() => {
     let data = getters.get().length ? {} : state;
+    // todo move this to a separate module and thoroughly test it
     getters.get().forEach((property: string) => {
       const value = get(state, property);
-      if (!value) {
-        return;
-      }
-      if (has(data, property)) {
-        set(data, property, mergeWith(get(data, property), value, mergeCustomizer));
+      const existingValue = get(data, property);
+      if (typeof existingValue == 'object' && typeof value == 'object') {
+        set(data, property, mergeWith(existingValue, serialize(value), mergeCustomizer));
+      } else if(typeof value == 'object') {
+        set(data, property, serialize(value));
       } else {
-        set(data, property, value)
+        set(data, property, value);
       }
     })
     postMessage({

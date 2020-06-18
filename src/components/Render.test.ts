@@ -21,8 +21,9 @@ describe('Render', () => {
     });
 
     it('should dispatch an event that specifies the getters', () => {
-      expect(eventHandler).toHaveBeenCalledTimes(1);
-      expect(eventHandler.calls.argsFor(0)[0].detail).toEqual(['profile.name', 'profile.city', 'profile']);
+      expect(eventHandler).toHaveBeenCalledTimes(2);
+      expect(eventHandler.calls.argsFor(0)[0].detail).toEqual(['profile']);
+      expect(eventHandler.calls.argsFor(1)[0].detail).toEqual(['profile.name', 'profile.city', 'profile']);
     });
   });
   
@@ -72,11 +73,12 @@ describe('Render', () => {
     });
 
     it('should dispatch getters for each item and the model', () => {
-      expect(eventHandler).toHaveBeenCalledTimes(4);
-      expect(eventHandler.calls.argsFor(0)[0].detail).toEqual(['profiles[0].name', 'profiles[0].city', 'profiles[0]']);
-      expect(eventHandler.calls.argsFor(1)[0].detail).toEqual(['profiles[1].name', 'profiles[1].city', 'profiles[1]']);
-      expect(eventHandler.calls.argsFor(2)[0].detail).toEqual(['profiles[2].name', 'profiles[2].city', 'profiles[2]']);
-      expect(eventHandler.calls.argsFor(3)[0].detail).toEqual(['profiles']);
+      expect(eventHandler).toHaveBeenCalledTimes(5);
+      expect(eventHandler.calls.argsFor(0)[0].detail).toEqual(['profiles']);
+      expect(eventHandler.calls.argsFor(1)[0].detail).toEqual(['profiles[0].name', 'profiles[0].city', 'profiles[0]']);
+      expect(eventHandler.calls.argsFor(2)[0].detail).toEqual(['profiles[1].name', 'profiles[1].city', 'profiles[1]']);
+      expect(eventHandler.calls.argsFor(3)[0].detail).toEqual(['profiles[2].name', 'profiles[2].city', 'profiles[2]']);
+      expect(eventHandler.calls.argsFor(4)[0].detail).toEqual(['profiles']);
     });
     
     it('should update the rendered list when an item in the list is updated', async () => {
