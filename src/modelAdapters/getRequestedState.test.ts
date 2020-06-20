@@ -40,7 +40,6 @@ describe('getRequestedState', () => {
       'friends[0].children[0].name'
     ];
 
-    console.log(JSON.stringify(getRequestedState(getters, state)));
     expect(getRequestedState(getters, state)).toEqual({
       "name": "steve",
       "city": "London",
@@ -52,11 +51,97 @@ describe('getRequestedState', () => {
             { "name": "Sarah" }
           ]
         },
-        { 
-          "age": 20, 
-          "name": "John" 
+        {
+          "age": 20,
+          "name": "John"
         }
       ]
+    });
+  });
+
+  it('should serialize and return a class based state', () => {
+    class TodoList {
+      isSelected: boolean = false;
+      name: string = '';
+      description: string = '';
+      date: Date;
+      id: string;
+      isDeleted: boolean = false;
+
+      constructor(props: { name: string, id: string, date: Date, description: string }) {
+        this.name = props.name;
+        this.id = props.id;
+        this.date = props.date;
+        this.description = props.description;
+      }
+    }
+
+    class ListCollection {
+      name = '';
+
+      description = '';
+
+      allLists: TodoList[] = [];
+
+      async addTodoList() {
+        const list = new TodoList({
+          name: this.name,
+          id: this.allLists.length.toString(),
+          date: new Date(),
+          description: this.description
+        });
+        this.allLists.push(list)
+        this.description = '';
+        this.name = '';
+      }
+
+      setName({ value }: { value: string }) {
+        this.name = value;
+      }
+
+      setDescription({ value }: { value: string }) {
+        this.description = value;
+      }
+
+      get visibleLists() {
+        return this.allLists.filter(list => !list.isDeleted);
+      }
+
+      get deletedLists() {
+        return this.allLists.filter(list => list.isDeleted);
+      }
+
+      async clearAlDeletedLists() {
+        this.allLists = this.visibleLists;
+      }
+
+      get selectedList() {
+        return this.allLists.find(list => list.isSelected);
+      }
+    }
+
+    class State {
+      lists: ListCollection = new ListCollection();
+
+      list: TodoList | null = null;
+    }
+
+    const state = new State();
+    state.lists.name = 'My todo list',
+      state.lists.description = 'My description';
+    state.lists.addTodoList();
+
+    const getters = ['lists.visibleLists[0].name', 'lists.visibleLists[0].description', 'lists.name', 'lists.description'];
+
+    expect(getRequestedState(getters, state)).toEqual({
+      "lists": {
+        "visibleLists": [{ 
+          "name": "My todo list", 
+          "description": "My description" 
+        }], 
+        "name": "", 
+        "description": ""
+      }
     });
   });
 });
