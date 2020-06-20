@@ -5,6 +5,12 @@ const pattern = /([A-Za-z0-9_]*):([A-Za-z0-9-,]*)/;
 
 class ClassObserver extends AttributeObserver {
 
+  constructor (targetNode: Element|ShadowRoot, data: any) {
+    super(targetNode, data);
+    this.attributeName = 'tb-class';
+    this.observe();
+  }
+
   applyChanges(elements: Element[], data: any) {
     elements.forEach(element => {
       const classAttributeValue = element.getAttribute('tb-class');

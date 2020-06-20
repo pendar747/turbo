@@ -1,7 +1,7 @@
 import { customElement, html, property } from "lit-element";
 import TurboComponent from "./TurboComponent";
 import parseTemplate from "./parseTemplate";
-import observeActions from "../attributes/observeActions";
+import ActionObserver from "../attributes/ActionObserver";
 import { fire, on } from "../util";
 import ClassObserver from "../attributes/ClassObserver";
 
@@ -20,7 +20,7 @@ export default class Render extends TurboComponent {
 
   renderContent: ((data: any) => string)|undefined;
 
-  private actionObserver: MutationObserver|undefined;
+  private actionObserver: ActionObserver|undefined;
   private classObserver: ClassObserver|undefined;
 
   private get templateContent () {
@@ -42,9 +42,11 @@ export default class Render extends TurboComponent {
   attributeChangedCallback (name: string, old: string, value: string) {
     super.attributeChangedCallback(name, old, value);
     if (name === 'model' || name === 'context') {
-      this.actionObserver?.disconnect();
-      if (this.shadowRoot && this.stateName) {
-        this.actionObserver = observeActions(this.shadowRoot, this.stateName, this.model ?? undefined)
+      if (this.actionObserver && this.stateName) {
+        this.actionObserver.data = {
+          stateName: this.stateName,
+          model: this.model ?? undefined
+        }
       }
       this.dispatchGetters();
     }
@@ -68,7 +70,10 @@ export default class Render extends TurboComponent {
   connectedCallback () {
     super.connectedCallback();
     if (this.shadowRoot && this.stateName) {
-      this.actionObserver = observeActions(this.shadowRoot, this.stateName, this.model ?? undefined);
+      this.actionObserver = new ActionObserver(this.shadowRoot, {
+        stateName: this.stateName,
+        model: this.model ?? undefined
+      });
       this.classObserver = new ClassObserver(this.shadowRoot, this.value);
     }
     const { render, getters } = parseTemplate(this.templateContent);

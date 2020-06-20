@@ -1,12 +1,12 @@
 import { fixture, elementUpdated } from "@open-wc/testing-helpers";
 import { on } from "../util";
-import observeActions from './observeActions';
+import ActionObserver from './ActionObserver';
 
 describe('tb-action attribute', () => {
 
-  let observer: MutationObserver;
+  let observer: ActionObserver;
   beforeEach(() => {
-    observer = observeActions(document.body, 'main');
+    observer = new ActionObserver(document.body, { stateName: 'main' });
   });
 
   afterEach(() => {
@@ -133,7 +133,7 @@ describe('tb-action attribute', () => {
 
   it('should fire an event with data that is assigned to observeActions the beginning', async () => {
     observer.disconnect();
-    observer = observeActions(document.body, 'main', 'my-model');
+    observer = new ActionObserver(document.body, { model: 'my-model', stateName: 'main' });
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
@@ -150,7 +150,7 @@ describe('tb-action attribute', () => {
   
   it('should fire multiple events with data that is assigned to observeActions the beginning', async () => {
     observer.disconnect();
-    observer = observeActions(document.body, 'main', 'my-model');
+    observer = new ActionObserver(document.body, { model: 'my-model', stateName: 'main' });
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
@@ -173,7 +173,7 @@ describe('tb-action attribute', () => {
 
   it('should also include the data that is attached to the element target itself', async () => {
     observer.disconnect();
-    observer = observeActions(document.body, 'main', 'my-model');
+    observer = new ActionObserver(document.body, { model: 'my-model', stateName: 'main' });
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
@@ -192,7 +192,7 @@ describe('tb-action attribute', () => {
     
   it('should fire multiple events with the element data that is assigned to observeActions the beginning', async () => {
     observer.disconnect();
-    observer = observeActions(document.body, 'main', 'my-model');
+    observer = new ActionObserver(document.body, { model: 'my-model', stateName: 'main' });
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
@@ -221,7 +221,7 @@ describe('tb-action attribute', () => {
   
   it('should also include value of the target element in event data', async () => {
     observer.disconnect();
-    observer = observeActions(document.body, 'main', 'my-model');
+    observer = new ActionObserver(document.body, { model: 'my-model', stateName: 'main' });
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
