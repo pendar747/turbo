@@ -1,9 +1,9 @@
 import { customElement, html, property } from "lit-element";
 import TurboComponent from "./TurboComponent";
 import parseTemplate from "./parseTemplate";
-import observeActions from "./observeActions";
+import observeActions from "../attributes/observeActions";
 import { fire, on } from "../util";
-import ClassObserver from "./ClassObserver";
+import ClassObserver from "../attributes/ClassObserver";
 
 @customElement('tb-render')
 export default class Render extends TurboComponent {
