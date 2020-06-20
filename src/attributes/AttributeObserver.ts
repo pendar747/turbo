@@ -3,12 +3,13 @@ abstract class AttributeObserver<DataT = any> {
   private observer: MutationObserver;
   private _data: DataT;
   private elements: Element[] = [];
-  protected attributeName: string = '';
+  protected attributeName: string ;
   protected targetNode: Element|ShadowRoot;
 
-  constructor (targetNode: Element|ShadowRoot, data:DataT) {
+  constructor (targetNode: Element|ShadowRoot, data:DataT, attributeName: string) {
     this._data = data;
     this.targetNode = targetNode;
+    this.attributeName = attributeName;
     this.observer = new MutationObserver((mutationsList) => {
       for (let mutation of mutationsList) {
         if (mutation.type === 'childList') {
@@ -33,8 +34,8 @@ abstract class AttributeObserver<DataT = any> {
       }
     });
 
-    this.elements = Array.from(targetNode.querySelectorAll('[tb-class]'));
-    if (targetNode.nodeType == Node.ELEMENT_NODE && (targetNode as Element).hasAttribute('tb-class')) {
+    this.elements = Array.from(targetNode.querySelectorAll(`[${this.attributeName}]`));
+    if (targetNode.nodeType == Node.ELEMENT_NODE && (targetNode as Element).hasAttribute(this.attributeName)) {
       this.elements.push(targetNode as Element);
     }
   }

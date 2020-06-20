@@ -30,9 +30,8 @@ class ActionObserver extends AttributeObserver<{ stateName: string, model?: stri
   registeredElements = new Map<Element, Map<string, { userEvent: string, handler: (e: Event) => any }>>();
 
   constructor(targetNode: Element|ShadowRoot, data: any) {
-    super(targetNode, data);
+    super(targetNode, data, 'tb-action');
     this.registeredElements = new Map();
-    this.attributeName = 'tb-action';
     this.observe();
   }
 
