@@ -393,4 +393,39 @@ describe('Render', () => {
     expect(div?.className).toContain('green');
     expect(div?.className).toContain('border');
   });
+  
+ 
+  it('should assign attributes to elements that have the tb-bind attribute', async () => {
+    sessionStorage.setItem('main', JSON.stringify({
+      profile: {
+        name: 'steve'
+      }
+    }));
+    await fixture(`<template id="my-template">
+      <input tb-bind="name:value" type="text"/>
+    </template>`)
+    const parent = await fixture(`<div state="main"></div>`);
+    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });    
+
+    const input = el.shadowRoot?.querySelector('input');
+    if (input) {
+      await elementUpdated(input);
+    }
+
+    expect(input?.getAttribute('value')).toContain('steve');
+    
+    fire('main-state-update', {
+      state: {
+        profile: {
+          name: 'James'
+        }
+      }
+    });
+    
+    if (input) {
+      await elementUpdated(input);
+    }
+    
+    expect(input?.getAttribute('value')).toContain('James');
+  }); 
 });
