@@ -47,7 +47,7 @@ export default class Render extends TurboComponent {
       if (this.actionObserver && this.stateName) {
         this.actionObserver.data = {
           stateName: this.stateName,
-          model: this.model ?? undefined
+          model: this.fullModelPath ?? undefined
         }
       }
       this.dispatchGetters();
@@ -75,7 +75,7 @@ export default class Render extends TurboComponent {
     if (this.shadowRoot && this.stateName) {
       this.actionObserver = new ActionObserver(this.shadowRoot, {
         stateName: this.stateName,
-        model: this.model ?? undefined
+        model: this.fullModelPath ?? undefined
       });
       this.classObserver = new ClassObserver(this.shadowRoot, this.value);
       this.bindObserver = new BindObserver(this.shadowRoot, this.value);
@@ -96,7 +96,7 @@ export default class Render extends TurboComponent {
     ];
     renderElements.forEach(el => {
       if (this.model && !el.hasAttribute('context') && !el.hasAttribute('no-context')) {
-        el.setAttribute('context', this.model);
+        el.setAttribute('context', this.fullModelPath);
       }
     })
     super.updated(changedProps);
