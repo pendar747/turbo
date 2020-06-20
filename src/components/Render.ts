@@ -5,6 +5,7 @@ import ActionObserver from "../attributes/ActionObserver";
 import { fire, on } from "../util";
 import ClassObserver from "../attributes/ClassObserver";
 import BindObserver from "../attributes/BindObserver";
+import BindPropObserver from "../attributes/BindPropObserver";
 
 @customElement('tb-render')
 export default class Render extends TurboComponent {
@@ -24,6 +25,7 @@ export default class Render extends TurboComponent {
   private actionObserver: ActionObserver|undefined;
   private classObserver: ClassObserver|undefined;
   private bindObserver: BindObserver|undefined;
+  private bindPropObserver: BindPropObserver|undefined;
 
   private get templateContent () {
     return this.template ? document.getElementById(this.template)?.innerHTML || '' : '';
@@ -79,6 +81,7 @@ export default class Render extends TurboComponent {
       });
       this.classObserver = new ClassObserver(this.shadowRoot, this.value);
       this.bindObserver = new BindObserver(this.shadowRoot, this.value);
+      this.bindPropObserver = new BindPropObserver(this.shadowRoot, this.value);
     }
     const { render, getters } = parseTemplate(this.templateContent);
     this.renderContent = render;
@@ -103,9 +106,10 @@ export default class Render extends TurboComponent {
   }
 
   render () {
-    if (this.classObserver && this.bindObserver) {
+    if (this.classObserver && this.bindObserver && this.bindPropObserver) {
       this.classObserver.data = this.value;
       this.bindObserver.data = this.value;
+      this.bindPropObserver.data = this.value;
     }
     if (this.value === null || this.value === undefined) {
       return;
