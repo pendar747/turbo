@@ -7,7 +7,7 @@ describe('mobXAdapter', () => {
   let originalTimeout: number;
   beforeAll(() => {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
   });
 
   afterAll(() => {
