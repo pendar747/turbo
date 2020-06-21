@@ -18,6 +18,9 @@ export default class Render extends TurboComponent {
   @property()
   unless: string|null = null;
 
+  @property({ converter: (value: string|null) => typeof value === 'string' })
+  repeat: boolean = false;
+
   getters: string[] = [];
 
   renderContent: ((data: any) => string)|undefined;
@@ -64,7 +67,7 @@ export default class Render extends TurboComponent {
 
   dispatchGetters () {
     if (this.stateName) {
-      const gettersWithFullPath = Array.isArray(this.value) ? [] : this.getters.map(getter => `${this.fullModelPath}.${getter}`);
+      const gettersWithFullPath = this.repeat ? [] : this.getters.map(getter => `${this.fullModelPath}.${getter}`);
       const allGetters = [...gettersWithFullPath, this.fullModelPath];
       if (allGetters.length) {
         fire(`${this.stateName}-add-getters`, allGetters);
@@ -93,12 +96,9 @@ export default class Render extends TurboComponent {
   }
 
   updated (changedProps: any) {
-    const renderElements = [
-      ...Array.from(this.shadowRoot?.querySelectorAll('tb-render') ?? []),
-      ...Array.from(this.shadowRoot?.querySelectorAll('tb-form') ?? [])
-    ];
+    const renderElements = Array.from(this.shadowRoot?.querySelectorAll('tb-render') ?? []);
     renderElements.forEach(el => {
-      if (this.model && !el.hasAttribute('context') && !el.hasAttribute('no-context')) {
+      if (!el.hasAttribute('context') && !el.hasAttribute('no-context')) {
         el.setAttribute('context', this.fullModelPath);
       }
     })
@@ -114,7 +114,7 @@ export default class Render extends TurboComponent {
     if (this.value === null || this.value === undefined) {
       return;
     }
-    const content = Array.isArray(this.value)
+    const content = this.repeat
       ? html`<div id="container">${this.renderElements()}</div>`
       : this.renderContent 
         ? html`<div id="container" .innerHTML="${this.renderContent(this.value)}"></div>` 

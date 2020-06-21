@@ -59,10 +59,10 @@ describe('Render', () => {
       sessionStorage.setItem('list', JSON.stringify(state));
       await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
       const parent = await fixture(`<div state="list"></div>`);
-      el = await fixture(`<tb-render template="my-template" model="profiles"></tb-render>`, { parentNode: parent });
+      el = await fixture(`<tb-render repeat template="my-template" model="profiles"></tb-render>`, { parentNode: parent });
     });
     
-    it('should render a list when the model is an array', async () => {
+    it('should render a list when repeat attribute is set', async () => {
       expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(3);
       expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(1)')?.shadowRoot?.textContent)
         .toEqual('My name is Mike and I live in New York.');
@@ -255,7 +255,7 @@ describe('Render', () => {
     ));
     await fixture('<template id="my-template"><span>{name} lives in {city}</span></template>')
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render context="profile" template="my-template" model="friends"></tb-render>`, { parentNode: parent });
+    const el = await fixture(`<tb-render repeat context="profile" template="my-template" model="friends"></tb-render>`, { parentNode: parent });
 
     expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(2);
     expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(1)')?.shadowRoot?.textContent)
@@ -284,7 +284,7 @@ describe('Render', () => {
       <span>{name} lives in {city}</span>
       <div>
         <h2>friends</h2>
-        <tb-render template="my-template" model="friends"></tb-render>
+        <tb-render repeat template="my-template" model="friends"></tb-render>
       </div>
     </template>`)
     const parent = await fixture(`<div state="main"></div>`);
@@ -354,7 +354,7 @@ describe('Render', () => {
       <tb-render template="city" model="city"></tb-render>
     </template>`)
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+    const el = await fixture(`<tb-render repeat template="my-template" model="profile"></tb-render>`, { parentNode: parent });
 
     expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(1)')
       ?.shadowRoot?.querySelector('tb-render')?.shadowRoot?.textContent).toEqual('London has a population of 10000000 people.');
@@ -391,7 +391,7 @@ describe('Render', () => {
       <tb-render template="city" no-context model="mainCity"></tb-render>
     </template>`)
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+    const el = await fixture(`<tb-render repeat template="my-template" model="profile"></tb-render>`, { parentNode: parent });
 
     expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(1)')
       ?.shadowRoot?.querySelector('tb-render')?.shadowRoot?.textContent).toEqual('Los Angeles has a population of 10 people.');
