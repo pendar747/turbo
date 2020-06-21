@@ -42,7 +42,7 @@ export default abstract class TurboComponent extends LitElement {
   }
 
   private getStoredState () {
-    if (this.model && this.stateName) {
+    if (this.stateName) {
       // get the initial state from local storage
       const storedState = sessionStorage.getItem(this.stateName);
       if(storedState) {

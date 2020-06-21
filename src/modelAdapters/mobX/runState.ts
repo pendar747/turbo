@@ -2,6 +2,8 @@ import { on, fire } from "../../util";
 import { MessageData } from "./types";
 
 const runState = (worker: Worker, stateName: string): Worker => {
+  sessionStorage.clear();
+
   worker.onerror = (event) => {
     console.error(event.message, event.filename, event.lineno);
   }

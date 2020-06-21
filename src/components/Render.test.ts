@@ -167,6 +167,33 @@ describe('Render', () => {
       data: {}
     });
   });
+
+   
+  it('should fire an event for a nested template', async () => {
+    sessionStorage.setItem('main', JSON.stringify({ 
+      profile: { 
+        name: 'Mike', 
+        city: {
+          name: 'New York'
+        } 
+      } 
+    }));
+    await fixture('<template id="my-template"><button tb-action="click:click-me" id="my-button">click me</button></template>')
+    await fixture('<template id="template-2"><tb-render model="city" template="my-template"></tb-render></template>')
+    const parent = await fixture(`<div state="main"></div>`);
+    const el = await fixture(`<tb-render template="template-2" model="profile"></tb-render>`, { parentNode: parent });
+
+    const myEventCallback = jasmine.createSpy();
+    on('main-action', myEventCallback);
+    el.shadowRoot?.querySelector('tb-render')?.shadowRoot?.getElementById('my-button')?.dispatchEvent(new MouseEvent('click'));
+    
+    expect(myEventCallback.calls.count()).toEqual(1);
+    expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({ 
+      model: 'profile.city',
+      actionName: 'click-me',
+      data: {}
+    });
+  });
   
   it('should fire an event for the given model with the data that is attached to the element', async () => {
     sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
@@ -270,6 +297,37 @@ describe('Render', () => {
       .toContain('Steve lives in Berlin');
     expect(nestedRender?.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
       .toContain('James lives in London');
+  });
+   
+  it('should inherit the model from parent template when model is not provided', async () => {
+    sessionStorage.setItem('main', JSON.stringify(
+      { 
+        profile: { 
+          name: 'Mike', 
+          city: 'New York',
+          justMovedToCity: true,
+          friends: [{
+            name: 'Steve',
+            city: 'Berlin'
+          }, {
+            name: 'James',
+            city: 'London'
+          }]
+        },
+      }
+    ));
+    await fixture(`<template id="nested">{name} just moved to this city!</template>`)
+    await fixture(`<template id="my-template">
+      <span>{name} lives in {city}</span>
+      <tb-render if="justMovedToCity" template="nested"></tb-render>
+    </template>`)
+    const parent = await fixture(`<div state="main"></div>`);
+    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+
+    const nestedRender = el.shadowRoot?.querySelector('tb-render');
+
+    expect(nestedRender?.shadowRoot?.innerHTML)
+      .toContain('Mike just moved to this city!');
   });
   
   it('should render nested list templates', async () => {

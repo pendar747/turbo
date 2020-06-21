@@ -121,11 +121,11 @@ export default class Render extends TurboComponent {
         : '';
 
     if (this.if) {
-      return html`<tb-if model="${this.if}">${content}</tb-if>`;
+      return html`<tb-if context="${this.fullModelPath}" model="${this.if}">${content}</tb-if>`;
     }
 
     if (this.unless) {
-      return html`<tb-unless model="${this.unless}">${content}</tb-unless>`;
+      return html`<tb-unless context="${this.fullModelPath}" model="${this.unless}">${content}</tb-unless>`;
     }
     
     return content;
