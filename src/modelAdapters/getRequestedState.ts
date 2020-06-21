@@ -2,6 +2,7 @@ import get from 'lodash-es/get';
 import set from 'lodash-es/set';
 import merge from 'lodash-es/merge';
 import isNil from 'lodash-es/isNil';
+import omit from 'lodash-es/omit';
 
 const serialize = (obj: any) => JSON.parse(JSON.stringify(obj));
 
@@ -11,7 +12,7 @@ const getRequestedState = (getters: string[], state: { [key in string]: any }) =
     const value = get(state, property);
     const serializedValue = typeof value === 'object' ? serialize(value) : value;
     if (isNil(value)) {
-      set(data, property, value);
+      omit(data, property);
     } else {
       const newData = {};
       set(newData, property, serializedValue);

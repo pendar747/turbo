@@ -59,6 +59,54 @@ describe('getRequestedState', () => {
     });
   });
 
+  it('should omit properties that are null or undefined', () => {
+    const state = {
+      name: 'steve',
+      id: '1421',
+      friends: [{
+        name: 'james',
+        age: 30,
+        job: {
+          name: 'dentist',
+          yearsOfExperience: 5
+        }
+      }, {
+        name: 'John',
+        age: 20,
+        job: {
+          name: 'engineer',
+          yearsOfExperience: 4
+        }
+      }],
+      city: 'London'
+    }
+    const getters = [
+      'name',
+      'city',
+      'friends[0].age',
+      'friends[0].name',
+      'friends[1].age',
+      'friends[1].name',
+      'friends[0].children[0].name'
+    ];
+
+    expect(getRequestedState(getters, state)).toEqual({
+      "name": "steve",
+      "city": "London",
+      "friends": [
+        {
+          "age": 30,
+          "name": "james"
+        },
+        {
+          "age": 20,
+          "name": "John"
+        }
+      ]
+    });
+    
+  });
+
   it('should serialize and return a class based state', () => {
     class TodoList {
       isSelected: boolean = false;
