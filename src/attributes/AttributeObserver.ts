@@ -5,11 +5,16 @@ abstract class AttributeObserver<DataT = any> {
   private elements: Element[] = [];
   protected attributeName: string ;
   protected targetNode: Element|ShadowRoot;
+  
+  protected _stateName: string;
+  protected _model: string;
 
-  constructor (targetNode: Element|ShadowRoot, data:DataT, attributeName: string) {
+  constructor (targetNode: Element|ShadowRoot, data:DataT, attributeName: string, stateName: string, model: string) {
     this._data = data;
     this.targetNode = targetNode;
     this.attributeName = attributeName;
+    this._stateName = stateName;
+    this._model = model;
     this.observer = new MutationObserver((mutationsList) => {
       for (let mutation of mutationsList) {
         if (mutation.type === 'childList') {
@@ -38,6 +43,24 @@ abstract class AttributeObserver<DataT = any> {
     if (targetNode.nodeType == Node.ELEMENT_NODE && (targetNode as Element).hasAttribute(this.attributeName)) {
       this.elements.push(targetNode as Element);
     }
+  }
+  
+  set model (value: string) {
+    this._model = value;
+    this.applyChanges(this.elements, this._data);
+  }
+
+  get model () {
+    return this._model;
+  }
+
+  set stateName (value: string) {
+    this._stateName = value;
+    this.applyChanges(this.elements, this._data);
+  }
+
+  get stateName () {
+    return this._stateName;
   }
 
   observe (options: MutationObserverInit = { attributes: true, childList: true, subtree: true }) {

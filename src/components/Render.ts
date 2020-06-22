@@ -50,10 +50,7 @@ export default class Render extends TurboComponent {
     super.attributeChangedCallback(name, old, value);
     if (name === 'model' || name === 'context') {
       if (this.actionObserver && this.stateName) {
-        this.actionObserver.data = {
-          stateName: this.stateName,
-          model: this.fullModelPath ?? undefined
-        }
+        this.actionObserver.model = this.fullModelPath;
       }
       this.dispatchGetters();
     }
@@ -78,13 +75,10 @@ export default class Render extends TurboComponent {
   connectedCallback () {
     super.connectedCallback();
     if (this.shadowRoot && this.stateName) {
-      this.actionObserver = new ActionObserver(this.shadowRoot, {
-        stateName: this.stateName,
-        model: this.fullModelPath ?? undefined
-      });
-      this.classObserver = new ClassObserver(this.shadowRoot, this.value);
-      this.bindObserver = new BindObserver(this.shadowRoot, this.value);
-      this.bindPropObserver = new BindPropObserver(this.shadowRoot, this.value);
+      this.actionObserver = new ActionObserver(this.shadowRoot, this.stateName, this.fullModelPath);
+      this.classObserver = new ClassObserver(this.shadowRoot, this.value, this.stateName, this.fullModelPath);
+      this.bindObserver = new BindObserver(this.shadowRoot, this.value, this.stateName, this.fullModelPath);
+      this.bindPropObserver = new BindPropObserver(this.shadowRoot, this.value, this.stateName, this.fullModelPath);
     }
     const { render, getters } = parseTemplate(this.templateContent);
     this.renderContent = render;

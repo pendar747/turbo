@@ -6,7 +6,7 @@ describe('tb-action attribute', () => {
 
   let observer: ActionObserver;
   beforeEach(() => {
-    observer = new ActionObserver(document.body, { stateName: 'main' });
+    observer = new ActionObserver(document.body, 'main', 'item');
   });
 
   afterEach(() => {
@@ -21,7 +21,7 @@ describe('tb-action attribute', () => {
 
     expect(callback.calls.count()).toEqual(1);
     expect(callback.calls.argsFor(0)[0].detail).toEqual({
-      model: undefined,
+      model: 'item',
       actionName: 'my-event',
       data: {}
     });
@@ -37,12 +37,12 @@ describe('tb-action attribute', () => {
 
     expect(callback.calls.count()).toEqual(2);
     expect(callback.calls.argsFor(0)[0].detail).toEqual({
-      model: undefined,
+      model: 'item',
       actionName: 'my-event-2',
       data: {}
     });
     expect(callback.calls.argsFor(1)[0].detail).toEqual({
-      model: undefined,
+      model: 'item',
       actionName: 'highlight',
       data: {}
     });
@@ -58,7 +58,7 @@ describe('tb-action attribute', () => {
 
     expect(myEventCallback.calls.count()).toEqual(1);
     expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({
-      model: undefined,
+      model: 'item',
       actionName: 'my-other-event',
       data: {}
     });
@@ -75,12 +75,12 @@ describe('tb-action attribute', () => {
 
     expect(myEventCallback.calls.count()).toEqual(2);
     expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({
-      model: undefined,
+      model: 'item',
       actionName: 'my-other-event',
       data: {}
     });
     expect(myEventCallback.calls.argsFor(1)[0].detail).toEqual({
-      model: undefined,
+      model: 'item',
       actionName: 'my-event-3',
       data: {}
     });
@@ -94,7 +94,7 @@ describe('tb-action attribute', () => {
 
     expect(myEventCallback.calls.count()).toEqual(1);
     expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({
-      model: undefined,
+      model: 'item',
       actionName: 'my-event-3',
       data: {}
     });
@@ -120,12 +120,12 @@ describe('tb-action attribute', () => {
 
     expect(myEventCallback.calls.count()).toEqual(2);
     expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({
-      model: undefined,
+      model: 'item',
       actionName: 'my-event-3',
       data: {}
     });
     expect(myEventCallback.calls.argsFor(1)[0].detail).toEqual({
-      model: undefined,
+      model: 'item',
       actionName: 'my-event-3',
       data: {}
     });
@@ -133,7 +133,7 @@ describe('tb-action attribute', () => {
 
   it('should fire an event with data that is assigned to observeActions the beginning', async () => {
     observer.disconnect();
-    observer = new ActionObserver(document.body, { model: 'my-model', stateName: 'main' });
+    observer = new ActionObserver(document.body, 'main', 'my-model');
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
@@ -150,7 +150,7 @@ describe('tb-action attribute', () => {
   
   it('should fire multiple events with data that is assigned to observeActions the beginning', async () => {
     observer.disconnect();
-    observer = new ActionObserver(document.body, { model: 'my-model', stateName: 'main' });
+    observer = new ActionObserver(document.body, 'main', 'my-model');
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
@@ -173,7 +173,7 @@ describe('tb-action attribute', () => {
 
   it('should also include the data that is attached to the element target itself', async () => {
     observer.disconnect();
-    observer = new ActionObserver(document.body, { model: 'my-model', stateName: 'main' });
+    observer = new ActionObserver(document.body, 'main', 'my-model');
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
@@ -192,7 +192,7 @@ describe('tb-action attribute', () => {
     
   it('should fire multiple events with the element data that is assigned to observeActions the beginning', async () => {
     observer.disconnect();
-    observer = new ActionObserver(document.body, { model: 'my-model', stateName: 'main' });
+    observer = new ActionObserver(document.body, 'main', 'my-model');
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
@@ -221,7 +221,7 @@ describe('tb-action attribute', () => {
   
   it('should also include value of the target element in event data', async () => {
     observer.disconnect();
-    observer = new ActionObserver(document.body, { model: 'my-model', stateName: 'main' });
+    observer = new ActionObserver(document.body, 'main', 'my-model');
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);

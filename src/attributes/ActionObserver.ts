@@ -25,12 +25,12 @@ const getEventDescriptions = (attributeValue: string): EventDesc[] => {
     .filter(x => x !== undefined) as EventDesc[];
 }
 
-class ActionObserver extends AttributeObserver<{ stateName: string, model?: string }> {
+class ActionObserver extends AttributeObserver {
   
   registeredElements = new Map<Element, Map<string, { userEvent: string, handler: (e: Event) => any }>>();
 
-  constructor(targetNode: Element|ShadowRoot, data: any) {
-    super(targetNode, data, 'tb-action');
+  constructor(targetNode: Element|ShadowRoot, stateName: string, model: string) {
+    super(targetNode, undefined, 'tb-action', stateName, model);
     this.registeredElements = new Map();
     this.observe();
   }
@@ -102,8 +102,8 @@ class ActionObserver extends AttributeObserver<{ stateName: string, model?: stri
     actionBindings.forEach(this.applyDescs.bind(this));
   }
 
-  applyChanges(elements: Element[], data: { model?: string, stateName: string }) {
-    this.applyActions(elements, data.stateName, data.model);
+  applyChanges(elements: Element[]) {
+    this.applyActions(elements, this._stateName, this._model);
   }
 }
 
