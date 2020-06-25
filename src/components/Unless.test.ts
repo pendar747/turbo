@@ -1,8 +1,19 @@
-import { fixture, elementUpdated } from "@open-wc/testing-helpers";
+import { fixture } from "@open-wc/testing-helpers";
 import './Unless';
-import { fire } from "../util";
+import { fire, on } from "../util";
 
 describe('tb-unless', () => {
+  
+  it('should dispatch getters', async () => {
+    const eventHandler = jasmine.createSpy();
+    on('main-add-getters', eventHandler);
+    sessionStorage.setItem('main', JSON.stringify({ name: 'Jim' }));
+    const parentNode = await fixture('<div state="main"></div>')
+    const el = await fixture(`<tb-unless model="name">My message</tb-unless>`, { parentNode });
+
+    expect(eventHandler.calls.argsFor(0)[0].detail).toEqual(['name']);
+  });
+
   it('should render the slot when model evaluates to a truthy value', async () => {
     sessionStorage.setItem('main', JSON.stringify({ name: 'Jim' }));
     const parentNode = await fixture('<div state="main"></div>')

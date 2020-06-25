@@ -1,8 +1,18 @@
-import { fixture, elementUpdated } from "@open-wc/testing-helpers";
+import { fixture } from "@open-wc/testing-helpers";
 import './If';
-import { fire } from "../util";
+import { fire, on } from "../util";
 
 describe('tb-if', () => {
+
+  it('should dispatch getters', async () => {
+    const eventHandler = jasmine.createSpy();
+    on('main-add-getters', eventHandler);
+    sessionStorage.setItem('main', JSON.stringify({ name: 'Jim' }));
+    const parentNode = await fixture('<div state="main"></div>')
+    await fixture(`<tb-if model="name">My message</tb-if>`, { parentNode });
+
+    expect(eventHandler.calls.argsFor(0)[0].detail).toEqual(['name']);
+  });
   
   it('should render the slot when model evaluates to a truthy value', async () => {
     sessionStorage.setItem('main', JSON.stringify({ name: 'Jim' }));
