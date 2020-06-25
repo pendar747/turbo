@@ -15,10 +15,12 @@ describe('mobXAdapter', () => {
   });
 
   let worker: Worker;
-
-  beforeEach(() => {
+  let onStateUpdate: jasmine.Spy;
+  beforeEach(async () => {
+    onStateUpdate = jasmine.createSpy();
+    on('app-state-update', onStateUpdate);
     worker = new Worker('/base/dist/modelAdapters/mobX/sampleState.js', { type: 'module' });
-    runState(worker, 'main');
+    await runState(worker, 'app');
   });
 
   afterEach(() => {
@@ -26,15 +28,12 @@ describe('mobXAdapter', () => {
   });
 
   it('should fire an initial state update', async () => {
-    const onStateUpdate = jasmine.createSpy();
-    on('main-state-update', onStateUpdate);
-
     await waitUntil(() => onStateUpdate.calls.count() == 1);
-    expect(JSON.parse(sessionStorage.getItem('main') ?? '{}')).toEqual({
+    expect(JSON.parse(sessionStorage.getItem('app') ?? '{}')).toEqual({
       todos: []
     });
     expect(onStateUpdate.calls.argsFor(0)[0].detail).toEqual({
-      stateName: 'main',
+      stateName: 'app',
       state: {
         todos: []
       }
@@ -42,22 +41,21 @@ describe('mobXAdapter', () => {
   });
 
   it('should start a mobX state in a webworker', async () => {
-    const onStateUpdate = jasmine.createSpy();
-    on('main-state-update', onStateUpdate);
-    fire('main-action', {
+    fire('app-action', {
       actionName: 'addTodo',
       data: {
         text: 'My todo'
       }
     });
 
+    console.log(onStateUpdate.calls.count());
     await waitUntil(() => onStateUpdate.calls.count() == 2);
 
-    expect(JSON.parse(sessionStorage.getItem('main') ?? '{}')).toEqual({
+    expect(JSON.parse(sessionStorage.getItem('app') ?? '{}')).toEqual({
       todos: [{ text: 'My todo' }]
     });
     expect(onStateUpdate.calls.argsFor(1)[0].detail).toEqual({
-      stateName: 'main',
+      stateName: 'app',
       state: {
         todos: [{ text: 'My todo' }]
       }
@@ -65,15 +63,13 @@ describe('mobXAdapter', () => {
   });
 
   it('should update a model in the state', async () => {
-    const onStateUpdate = jasmine.createSpy();
-    on('main-state-update', onStateUpdate);
-    fire('main-action', {
+    fire('app-action', {
       actionName: 'addTodo',
       data: {
         text: 'My todo'
       }
     });
-    fire('main-action', {
+    fire('app-action', {
       model: 'todos[0]',
       actionName: 'edit',
       data: {
@@ -83,11 +79,11 @@ describe('mobXAdapter', () => {
 
     await waitUntil(() => onStateUpdate.calls.count() == 3);
 
-    expect(JSON.parse(sessionStorage.getItem('main') ?? '{}')).toEqual({
+    expect(JSON.parse(sessionStorage.getItem('app') ?? '{}')).toEqual({
       todos: [{ text: 'Something else' }]
     });
     expect(onStateUpdate.calls.argsFor(2)[0].detail).toEqual({
-      stateName: 'main',
+      stateName: 'app',
       state: {
         todos: [{ text: 'Something else' }]
       }
@@ -96,17 +92,14 @@ describe('mobXAdapter', () => {
 
   describe('getters', () => {
 
-    let onStateUpdate: jasmine.Spy;
     beforeEach( async () => {
-      onStateUpdate = jasmine.createSpy();
-      on('main-state-update', onStateUpdate);
-      fire('main-action', {
+      fire('app-action', {
         actionName: 'addTodo',
         data: {
           text: 'My todo'
         }
       });
-      fire('main-action', {
+      fire('app-action', {
         actionName: 'addTodo',
         data: {
           text: 'Another todo'
@@ -115,15 +108,15 @@ describe('mobXAdapter', () => {
     });
 
     it('should expose computed properties', async () => {
-      fire('main-add-getters', ['todos', 'allTodosSummary']);
+      fire('app-add-getters', ['todos', 'allTodosSummary']);
       await waitUntil(() => onStateUpdate.calls.count() == 4);
 
-      expect(JSON.parse(sessionStorage.getItem('main') ?? '{}')).toEqual({
+      expect(JSON.parse(sessionStorage.getItem('app') ?? '{}')).toEqual({
         todos: [{ text: 'My todo' }, { text: 'Another todo' }],
         allTodosSummary: 'My todo, Another todo'
       });
       expect(onStateUpdate.calls.argsFor(3)[0].detail).toEqual({
-        stateName: 'main',
+        stateName: 'app',
         state: {
           todos: [{ text: 'My todo' }, { text: 'Another todo' }],
           allTodosSummary: 'My todo, Another todo'
@@ -132,15 +125,15 @@ describe('mobXAdapter', () => {
     });
 
     it('should handle nested computed properties', async () => {
-      fire('main-add-getters', ['todos[0].quotedText', 'todos', 'allTodosSummary']);
+      fire('app-add-getters', ['todos[0].quotedText', 'todos', 'allTodosSummary']);
       await waitUntil(() => onStateUpdate.calls.count() == 4);
       
-      expect(JSON.parse(sessionStorage.getItem('main') ?? '{}')).toEqual({
+      expect(JSON.parse(sessionStorage.getItem('app') ?? '{}')).toEqual({
         todos: [{ text: 'My todo', quotedText: '"My todo"' }, { text: 'Another todo' }],
         allTodosSummary: 'My todo, Another todo'
       });
       expect(onStateUpdate.calls.argsFor(3)[0].detail).toEqual({
-        stateName: 'main',
+        stateName: 'app',
         state: {
           todos: [{ text: 'My todo', quotedText: '"My todo"' }, { text: 'Another todo' }],
           allTodosSummary: 'My todo, Another todo'
@@ -149,17 +142,17 @@ describe('mobXAdapter', () => {
     });
 
     it('should accumulate multiple getters that are added by different events', async () => {
-      fire('main-add-getters', ['todos[0].quotedText', 'todos', 'allTodosSummary']);
-      fire('main-add-getters', ['todos[1].quotedText']);
+      fire('app-add-getters', ['todos[0].quotedText', 'todos', 'allTodosSummary']);
+      fire('app-add-getters', ['todos[1].quotedText']);
       await waitUntil(() => onStateUpdate.calls.count() == 5);
 
       const expectedState = {
         todos: [{ text: 'My todo', quotedText: '"My todo"' }, { text: 'Another todo', quotedText: '"Another todo"' }],
         allTodosSummary: 'My todo, Another todo'
       };
-      expect(JSON.parse(sessionStorage.getItem('main') ?? '{}')).toEqual(expectedState);
+      expect(JSON.parse(sessionStorage.getItem('app') ?? '{}')).toEqual(expectedState);
       expect(onStateUpdate.calls.argsFor(4)[0].detail).toEqual({
-        stateName: 'main',
+        stateName: 'app',
         state: expectedState
       })
     });

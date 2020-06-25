@@ -20,7 +20,7 @@ class Todo {
   }
 }
 
-@registerState('main')
+@registerState('app')
 export default class MainState {
   @observable
   todos: Todo[] = [];
