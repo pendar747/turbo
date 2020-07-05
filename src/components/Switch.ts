@@ -1,6 +1,7 @@
 import { customElement, html } from 'lit-element';
 import TurboComponent from "./TurboComponent";
 import { Route } from '..';
+import { on } from '../util';
 
 @customElement('tb-switch')
 export default class Switch extends TurboComponent {
@@ -8,37 +9,32 @@ export default class Switch extends TurboComponent {
   private get routes (): Route[] {
     return Array.from(this.querySelectorAll('tb-route'));
   }
+  
+  private onPageChange = async () => {
+    const firstMatchingRoute = this.routes.find(route => route.isMatching());
+    if(firstMatchingRoute) {
+      firstMatchingRoute.setSelected(true);
+    }
+    this.routes
+      .filter(route => route !== firstMatchingRoute)
+      .forEach(route => route.setSelected(false));
+  }
+
+  disconnectedCallback () {
+    // TODO: fix removeEventListener to work properly
+    super.disconnectedCallback();
+    window.removeEventListener('popstate', this.onPageChange);
+    document.removeEventListener('page-change', this.onPageChange);
+  }
 
   connectedCallback () {
-    super.connectedCallback();
-    const switchToRoute = (event: any) => {
-      const route = event.target;
-      this.routes.forEach(routeB => {
-        if (routeB !== route && routeB.isMatching()) {
-          if (this.routes.indexOf(routeB) > this.routes.indexOf(route)) {
-            routeB.cancelMatch();
-          } else {
-            route.cancelMatch();
-          }
-        }
-      })
-    }
-    const applySwitch = () => {
-      this.routes.forEach((route) => {
-        route.removeEventListener('match', switchToRoute);
-        route.addEventListener('match', switchToRoute);
-      })
-    }
-    const observer = new MutationObserver((mutationList) => {
-      for (const mutation of mutationList) {
-        if (mutation.type == 'childList') {
-          applySwitch();
-        }
-      }
+    on(`${this.stateName}-state-started`, () => {
+      this.onPageChange();
     });
-
-    observer.observe(this, { attributes: false, childList: true });
-    applySwitch();
+    this.onPageChange();
+    window.addEventListener('popstate', this.onPageChange);
+    on('page-change', this.onPageChange);
+    super.connectedCallback();
   }
 
   render () {

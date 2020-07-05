@@ -1,6 +1,6 @@
 import { customElement, html, property } from "lit-element";
-import { on, fire } from "../util";
-import { match, MatchFunction, Match, pathToRegexp } from 'path-to-regexp';
+import { fire } from "../util";
+import { match, MatchFunction, Match } from 'path-to-regexp';
 import observeAnchors from "./observeAnchors";
 import TurboComponent from "./TurboComponent";
 
@@ -21,6 +21,14 @@ export default class Route extends TurboComponent {
     return this.matchFn && this.matchFn(this.pagePath) !== false;
   }
 
+  setSelected (isSelected: boolean) {
+    if (this.matchFn) {
+      this.match = isSelected ? this.matchFn(this.pagePath) : false;
+      this.fireAction();
+      this.requestUpdate();
+    }
+  }
+
   private fireAction () {
     if (this.action && this.match) {
       fire(`${this.stateName}-action`, {
@@ -37,38 +45,6 @@ export default class Route extends TurboComponent {
     return location.pathname;
   };
 
-  private onPageChange = async () => {
-    this.match = this.matchFn ? this.matchFn(this.pagePath) : false;
-    if (this.isConnected) {
-      this.fireAction();
-      this.requestUpdate();
-    }
-  }
-
-  attributeChangedCallback (name: string, old: string, value: string) {
-    super.attributeChangedCallback(name, old, value);
-    if (name == 'path') {
-      this.matchFn = match(value, { end: false });
-    }
-  }
-
-  disconnectedCallback () {
-    // TODO: fix removeEventListener to work properly
-    super.disconnectedCallback();
-    window.removeEventListener('popstate', this.onPageChange);
-    document.removeEventListener('page-change', this.onPageChange);
-  }
-
-  connectedCallback () {
-    on(`${this.stateName}-state-started`, () => {
-      this.onPageChange();
-    });
-    this.onPageChange();
-    window.addEventListener('popstate', this.onPageChange);
-    on('page-change', this.onPageChange);
-    super.connectedCallback();
-  }
-
   updated (changedProps: any) {
     super.updated(changedProps);
 
@@ -77,13 +53,11 @@ export default class Route extends TurboComponent {
     }
   }
 
-  /**
-   * this method is used by tb-switch to cancel subsequent tb-routes when the first
-   * one is matched
-   */
-  cancelMatch () {
-    this.match = false;
-    this.requestUpdate();
+  attributeChangedCallback (name: string, old: string, value: string) {
+    super.attributeChangedCallback(name, old, value);
+    if (name === 'path' && value) {
+      this.matchFn = match(value, { end: false });
+    }
   }
 
   render () {
