@@ -14,8 +14,12 @@ export default class Switch extends TurboComponent {
     const switchToRoute = (event: any) => {
       const route = event.target;
       this.routes.forEach(routeB => {
-        if (routeB !== route) {
-          routeB.cancelMatch();
+        if (routeB !== route && routeB.isMatching()) {
+          if (this.routes.indexOf(routeB) > this.routes.indexOf(route)) {
+            routeB.cancelMatch();
+          } else {
+            route.cancelMatch();
+          }
         }
       })
     }

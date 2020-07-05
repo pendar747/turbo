@@ -17,6 +17,10 @@ export default class Route extends TurboComponent {
 
   private match: Match|false = false;
 
+  isMatching () {
+    return this.matchFn && this.matchFn(this.pagePath) !== false;
+  }
+
   private fireAction () {
     if (this.action && this.match) {
       fire(`${this.stateName}-action`, {
@@ -44,7 +48,6 @@ export default class Route extends TurboComponent {
   attributeChangedCallback (name: string, old: string, value: string) {
     super.attributeChangedCallback(name, old, value);
     if (name == 'path') {
-      // TODO fix the issue of all routes matching to one pattern
       this.matchFn = match(value, { end: false });
     }
   }
