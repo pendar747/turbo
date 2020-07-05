@@ -34,7 +34,6 @@ export default class Route extends TurboComponent {
   };
 
   private onPageChange = async () => {
-    debugger;
     this.match = this.matchFn ? this.matchFn(this.pagePath) : false;
     if (this.isConnected) {
       this.fireAction();
@@ -45,6 +44,7 @@ export default class Route extends TurboComponent {
   attributeChangedCallback (name: string, old: string, value: string) {
     super.attributeChangedCallback(name, old, value);
     if (name == 'path') {
+      // TODO fix the issue of all routes matching to one pattern
       this.matchFn = match(value, { end: false });
     }
   }
@@ -74,7 +74,19 @@ export default class Route extends TurboComponent {
     }
   }
 
+  /**
+   * this method is used by tb-switch to cancel subsequent tb-routes when the first
+   * one is matched
+   */
+  cancelMatch () {
+    this.match = false;
+    this.requestUpdate();
+  }
+
   render () {
+    if (this.match !== false) {
+      this.dispatchEvent(new CustomEvent('match'));
+    }
     return this.match == false
       ? html``
       : html`<slot></slot>`;

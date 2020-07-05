@@ -7,6 +7,7 @@ import ClassObserver from "../attributes/ClassObserver";
 import BindObserver from "../attributes/BindObserver";
 import BindPropObserver from "../attributes/BindPropObserver";
 import observeAnchors from "./observeAnchors";
+import isNil from 'lodash-es/isNil';
 
 @customElement('tb-render')
 export default class Render extends TurboComponent {
@@ -112,7 +113,7 @@ export default class Render extends TurboComponent {
       this.bindObserver.data = this.value;
       this.bindPropObserver.data = this.value;
     }
-    if (this.value === null || this.value === undefined) {
+    if (this.fullModelPath.length > 0 && isNil(this.value)) {
       return;
     }
     const content = this.repeat

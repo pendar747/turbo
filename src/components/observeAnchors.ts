@@ -6,7 +6,7 @@ const isLocal = (href: string) => {
 
 const registeredElements = new Map<HTMLAnchorElement, Function>();
 
-const observeAnchors = (shadowRoot: ShadowRoot) => {
+const observeAnchors = (shadowRoot: ShadowRoot|Element) => {
   const anchors = Array.from(shadowRoot.querySelectorAll('a'));
   anchors.forEach(anchor => {
     const handler = (event: MouseEvent) => {
@@ -15,7 +15,6 @@ const observeAnchors = (shadowRoot: ShadowRoot) => {
       if (!href) {
         return;
       }
-      console.log(href, isLocal(href));
       if (isLocal(href)) {
         history.pushState({ page: href }, '', href);
         fire('page-change');

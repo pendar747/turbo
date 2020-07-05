@@ -48,7 +48,6 @@ describe('mobXAdapter', () => {
       }
     });
 
-    console.log(onStateUpdate.calls.count());
     await waitUntil(() => onStateUpdate.calls.count() == 2);
 
     expect(JSON.parse(sessionStorage.getItem('app') ?? '{}')).toEqual({
