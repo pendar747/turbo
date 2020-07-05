@@ -6,6 +6,7 @@ import { fire, on } from "../util";
 import ClassObserver from "../attributes/ClassObserver";
 import BindObserver from "../attributes/BindObserver";
 import BindPropObserver from "../attributes/BindPropObserver";
+import observeAnchors from "./observeAnchors";
 
 @customElement('tb-render')
 export default class Render extends TurboComponent {
@@ -90,12 +91,18 @@ export default class Render extends TurboComponent {
   }
 
   updated (changedProps: any) {
-    const renderElements = Array.from(this.shadowRoot?.querySelectorAll('tb-render') ?? []);
+    const renderElements = [
+      ...Array.from(this.shadowRoot?.querySelectorAll('tb-render') ?? []),
+      ...Array.from(this.shadowRoot?.querySelectorAll('tb-route') ?? [])
+    ];
     renderElements.forEach(el => {
       if (!el.hasAttribute('context') && !el.hasAttribute('no-context')) {
         el.setAttribute('context', this.fullModelPath);
       }
     })
+    if (this.shadowRoot) {
+      observeAnchors(this.shadowRoot);
+    }
     super.updated(changedProps);
   }
 
