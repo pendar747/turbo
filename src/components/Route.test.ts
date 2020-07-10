@@ -62,4 +62,41 @@ describe('tb-route', () => {
     });
 
   });
+
+  it('should fire the function again when context or model changes and route is selected', async () => {
+    const parent = await fixture('<div state="main"></div>');
+    const handler = jasmine.createSpy();
+    on('main-action', handler);
+    const el: Route = await fixture(`<tb-route action="myAction" path="/user/:id/post/:postId"><p>user profile</p></tb-route>`, { parentNode: parent });
+    history.pushState(null, 'user profile', '/user/2/post/4');
+    el.setSelected(true);
+
+    el.setAttribute('model', 'list');
+
+    await elementUpdated(el);
+
+    el.setAttribute('context', 'myApp');
+
+    await elementUpdated(el);
+
+    expect(handler).toHaveBeenCalledTimes(3);
+    expect((handler.calls.argsFor(0)[0] as CustomEvent).detail)
+      .toEqual({ 
+        data: { params: { id: '2', postId: '4' }},
+        actionName: 'myAction',
+        model: ''
+      });
+    expect((handler.calls.argsFor(1)[0] as CustomEvent).detail)
+      .toEqual({ 
+        data: { params: { id: '2', postId: '4' }},
+        actionName: 'myAction',
+        model: 'list'
+      });
+    expect((handler.calls.argsFor(2)[0] as CustomEvent).detail)
+      .toEqual({ 
+        data: { params: { id: '2', postId: '4' }},
+        actionName: 'myAction',
+        model: 'myApp.list'
+      });
+  });
 });

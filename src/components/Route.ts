@@ -58,6 +58,11 @@ export default class Route extends TurboComponent {
     if (name === 'path' && value) {
       this.matchFn = match(value, { end: false });
     }
+    // if the model or context property changes
+    // the route fires the action again
+    if (name === 'model' || name === 'context') {
+      this.fireAction();
+    }
   }
 
   render () {
