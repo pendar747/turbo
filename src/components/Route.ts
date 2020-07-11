@@ -1,5 +1,5 @@
 import { customElement, html, property } from "lit-element";
-import { fire } from "../util";
+import { fire, on } from "../util";
 import { match, MatchFunction, Match } from 'path-to-regexp';
 import observeAnchors from "./observeAnchors";
 import TurboComponent from "./TurboComponent";
@@ -53,6 +53,18 @@ export default class Route extends TurboComponent {
     }
   }
 
+  connectedCallback () {
+    super.connectedCallback();
+    on(`${this.stateName}-state-started`, () => {
+      this.dispatchGetters();
+    });
+    this.dispatchGetters();
+  }
+
+  dispatchGetters () {
+    fire(`${this.stateName}-add-getters`, [this.fullModelPath]);
+  }
+
   attributeChangedCallback (name: string, old: string, value: string) {
     super.attributeChangedCallback(name, old, value);
     if (name === 'path' && value) {
@@ -62,6 +74,7 @@ export default class Route extends TurboComponent {
     // the route fires the action again
     if (name === 'model' || name === 'context') {
       this.fireAction();
+      this.dispatchGetters();
     }
   }
 

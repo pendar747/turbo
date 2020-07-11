@@ -1,6 +1,6 @@
 import Route from './Route';
 import { fixture, elementUpdated } from '@open-wc/testing-helpers';
-import { on } from '../util';
+import { on, fire } from '../util';
 
 describe('tb-route', () => {
 
@@ -98,5 +98,49 @@ describe('tb-route', () => {
         actionName: 'myAction',
         model: 'myApp.list'
       });
+  });
+
+  describe('getters', () => {
+
+    it('should dispatch the full model path as getters when connected', async () => {
+      const handler = jasmine.createSpy();
+      on('myApp-add-getters', handler);
+      const parentNode = await fixture('<div state="myApp"></div>');
+      const el: Route = await fixture(`<tb-route context="list" model="item" path="/user/:id"></tb-route>`, { parentNode });
+
+      expect(handler).toHaveBeenCalledTimes(3);
+      expect(handler.calls.argsFor(2)[0].detail).toEqual(['list.item']);
+    });
+    
+
+    it('should dispatch getters when model or context change', async () => {
+      const parentNode = await fixture('<div state="myApp"></div>');
+      const el: Route = await fixture(`<tb-route context="list" model="item" path="/user/:id"></tb-route>`, { parentNode });
+      
+      const handler = jasmine.createSpy();
+      on('myApp-add-getters', handler);
+
+      el.setAttribute('model', 'item2');
+      await elementUpdated(el);
+
+      expect(handler.calls.argsFor(0)[0].detail).toEqual(['list.item2']);
+      
+      el.setAttribute('context', 'list2');
+      await elementUpdated(el);
+      
+      expect(handler.calls.argsFor(1)[0].detail).toEqual(['list2.item2']);
+    });
+
+    it('should dispatch getters after state is started', async () => {
+      const handler = jasmine.createSpy();
+      const parentNode = await fixture('<div state="myApp2"></div>');
+      const el: Route = await fixture(`<tb-route context="list" model="item" path="/user/:id"></tb-route>`, { parentNode });
+      
+      on('myApp2-add-getters', handler);
+
+      fire('myApp2-state-started');
+
+      expect(handler.calls.argsFor(0)[0].detail).toEqual(['list.item']);
+    });
   });
 });
