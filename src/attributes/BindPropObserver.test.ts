@@ -1,4 +1,4 @@
-import { fixture } from "@open-wc/testing-helpers";
+import { fixture, waitUntil } from "@open-wc/testing-helpers";
 import BindPropObserver from "./BindPropObserver";
 import { on } from "../util";
 
@@ -13,6 +13,8 @@ describe('tb-bind-prop', () => {
     const el: HTMLInputElement = await fixture(`<input tb-bind-prop="name:value" type="text" />`);
     observer = new BindPropObserver(el, { name: 'Dan' }, 'main', 'item');
 
+    // property is set with a delay so this is necessary
+    await waitUntil(() => el.value === 'Dan');
     expect(el.value).toEqual('Dan');
   });
   
@@ -21,6 +23,8 @@ describe('tb-bind-prop', () => {
     observer = new BindPropObserver(el, { name: 'Dan' }, 'main', 'item');
 
     observer.data = { name: 'James' };
+    // property is set with a delay so this is necessary
+    await waitUntil(() => el.value === 'James');
     expect(el.value).toEqual('James');
   });
   
@@ -28,6 +32,8 @@ describe('tb-bind-prop', () => {
     const el: HTMLInputElement = await fixture(`<input tb-bind-prop="name:value;defaultName:placeholder" type="text" />`);
     observer = new BindPropObserver(el, { name: 'Dan', defaultName: 'Asimov' }, 'main', 'item');
 
+    // property is set with a delay so this is necessary
+    await waitUntil(() => el.value === 'Dan');
     expect(el.value).toEqual('Dan');
     expect(el.placeholder).toEqual('Asimov');
   });
@@ -38,6 +44,8 @@ describe('tb-bind-prop', () => {
 
     const el: HTMLInputElement = await fixture('<input tb-bind-prop="name:value" />', { parentNode: parent });
 
+    // property is set with a delay so this is necessary
+    await waitUntil(() => el.value === 'Pete');
     expect(el.value).toEqual('Pete');
   });
   

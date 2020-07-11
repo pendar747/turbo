@@ -3,6 +3,7 @@ import getValueList from "./getValueList";
 import get from 'lodash-es/get';
 import set from "lodash-es/set";
 import addNewGetters from './addNewGetters';
+import isNil from "lodash-es/isNil";
 
 class BindPropObserver extends AttributeObserver {
 
@@ -20,6 +21,20 @@ class BindPropObserver extends AttributeObserver {
 
   private addNewGetters = addNewGetters;
 
+  setPropertyValue (element: Element, property: string, value: any) {
+    // if the property type is string, setting null or undefined
+    // will turn it into "undefined" and "null" which we need to avoid
+    if (typeof get(element, property) === 'string' && isNil(value)) {
+      return;
+    }
+    
+    // set the property value with a delay to handle the case when
+    // user action is currently changing the property
+    setTimeout(() => {
+      set(element, property, value);
+    }, 500);
+  }
+
   applyChanges (elements: Element[], data: any) {
     elements.forEach(element => {
       const matches = getValueList(element.getAttribute(this.attributeName))
@@ -30,7 +45,7 @@ class BindPropObserver extends AttributeObserver {
       matches.forEach(({ dataProperty, elementProperties }) => {
         elementProperties.forEach(elementProp => {
           const value = get(data, dataProperty);
-          set(element, elementProp, value);
+          this.setPropertyValue(element, elementProp, value);
         })
       });
     });
