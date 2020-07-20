@@ -2,7 +2,7 @@ import { fixture, waitUntil } from "@open-wc/testing-helpers";
 import BindPropObserver from "./BindPropObserver";
 import { on } from "../util";
 
-describe('tb-bind-prop', () => {
+describe('px-bind-prop', () => {
 
   let observer: BindPropObserver;
   afterEach(() => {
@@ -10,7 +10,7 @@ describe('tb-bind-prop', () => {
   });
 
   it('should element properties based on the bindings', async () => {
-    const el: HTMLInputElement = await fixture(`<input tb-bind-prop="name:value" type="text" />`);
+    const el: HTMLInputElement = await fixture(`<input px-bind-prop="name:value" type="text" />`);
     observer = new BindPropObserver(el, { name: 'Dan' }, 'main', 'item');
 
     // property is set with a delay so this is necessary
@@ -19,7 +19,7 @@ describe('tb-bind-prop', () => {
   });
   
   it('should update the prop when the model data changes', async () => {
-    const el: HTMLInputElement = await fixture(`<input tb-bind-prop="name:value" type="text" />`);
+    const el: HTMLInputElement = await fixture(`<input px-bind-prop="name:value" type="text" />`);
     observer = new BindPropObserver(el, { name: 'Dan' }, 'main', 'item');
 
     observer.data = { name: 'James' };
@@ -29,7 +29,7 @@ describe('tb-bind-prop', () => {
   });
   
   it('should be able to apply multiple props', async () => {
-    const el: HTMLInputElement = await fixture(`<input tb-bind-prop="name:value;defaultName:placeholder" type="text" />`);
+    const el: HTMLInputElement = await fixture(`<input px-bind-prop="name:value;defaultName:placeholder" type="text" />`);
     observer = new BindPropObserver(el, { name: 'Dan', defaultName: 'Asimov' }, 'main', 'item');
 
     // property is set with a delay so this is necessary
@@ -42,7 +42,7 @@ describe('tb-bind-prop', () => {
     const parent = await fixture('<div></div>');
     observer = new BindPropObserver(parent, { name: 'Pete' }, 'main', 'item');
 
-    const el: HTMLInputElement = await fixture('<input tb-bind-prop="name:value" />', { parentNode: parent });
+    const el: HTMLInputElement = await fixture('<input px-bind-prop="name:value" />', { parentNode: parent });
 
     // property is set with a delay so this is necessary
     await waitUntil(() => el.value === 'Pete');
@@ -55,7 +55,7 @@ describe('tb-bind-prop', () => {
 
     const eventHandler = jasmine.createSpy();
     on('main-add-getters', eventHandler);
-    const el: HTMLInputElement = await fixture('<input tb-bind-prop="name:value;defaultName:placeholder" />', { parentNode: parent });
+    const el: HTMLInputElement = await fixture('<input px-bind-prop="name:value;defaultName:placeholder" />', { parentNode: parent });
 
     expect(eventHandler.calls.argsFor(0)[0].detail).toEqual(['item.name', 'item.defaultName']);
   });

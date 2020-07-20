@@ -2,7 +2,7 @@ import { fixture, elementUpdated } from "@open-wc/testing-helpers";
 import ClassObserver from "./ClassObserver";
 import { on } from "../util";
 
-describe('tb-class attribute', () => {
+describe('px-class attribute', () => {
 
   let observer: ClassObserver;
   afterEach(() => {
@@ -10,7 +10,7 @@ describe('tb-class attribute', () => {
   });
 
   it('should add classes defined in condition:my-class to the element when the condition is true', async () => {
-    const el = await fixture(`<div tb-class="isRead:highlighted"></div>`);
+    const el = await fixture(`<div px-class="isRead:highlighted"></div>`);
 
     observer = new ClassObserver(el, { isRead: true }, 'main', 'item');
 
@@ -19,7 +19,7 @@ describe('tb-class attribute', () => {
 
   it('should dispatch getters for the defined properties', async () => {
 
-    const el = await fixture(`<div tb-class="isRead:highlighted;isRecent:recent-color"></div>`);
+    const el = await fixture(`<div px-class="isRead:highlighted;isRecent:recent-color"></div>`);
     const eventHandler = jasmine.createSpy();
     on('main-add-getters', eventHandler);
 
@@ -30,13 +30,13 @@ describe('tb-class attribute', () => {
   
   it('should not dispatch getters if they have already been dispatched', async () => {
 
-    const el = await fixture(`<div tb-class="isRead:highlighted;isRecent:recent-color"></div>`);
+    const el = await fixture(`<div px-class="isRead:highlighted;isRecent:recent-color"></div>`);
     const eventHandler = jasmine.createSpy();
     on('main-add-getters', eventHandler);
 
     observer = new ClassObserver(el, { isRead: true }, 'main', 'item');
 
-    el.setAttribute('tb-class', 'isRead:blue-color;isMeta:meta-styling');
+    el.setAttribute('px-class', 'isRead:blue-color;isMeta:meta-styling');
 
     await elementUpdated(el);
     expect(eventHandler.calls.argsFor(1)[0].detail).toEqual(['item.isMeta']);
@@ -44,7 +44,7 @@ describe('tb-class attribute', () => {
   
   it('should dispatch all getters to the new state if the state is changed', async () => {
 
-    const el = await fixture(`<div tb-class="isRead:highlighted;isRecent:recent-color"></div>`);
+    const el = await fixture(`<div px-class="isRead:highlighted;isRecent:recent-color"></div>`);
     const eventHandler = jasmine.createSpy();
 
     observer = new ClassObserver(el, { isRead: true }, 'main', 'item');
@@ -58,7 +58,7 @@ describe('tb-class attribute', () => {
   
   it('should dispatch all getters again if the model is changed', async () => {
 
-    const el = await fixture(`<div tb-class="isRead:highlighted;isRecent:recent-color"></div>`);
+    const el = await fixture(`<div px-class="isRead:highlighted;isRecent:recent-color"></div>`);
     const eventHandler = jasmine.createSpy();
     
     on('main-add-getters', eventHandler);
@@ -71,7 +71,7 @@ describe('tb-class attribute', () => {
   });
     
   it('should apply multiple classes for a condition', async () => {
-    const el = await fixture(`<div tb-class="isRead:highlighted,border"></div>`);
+    const el = await fixture(`<div px-class="isRead:highlighted,border"></div>`);
 
     observer = new ClassObserver(el, { isRead: true }, 'main', 'item');
 
@@ -80,7 +80,7 @@ describe('tb-class attribute', () => {
   });
   
   it('should add apply multiple conditions', async () => {
-    const el = await fixture(`<div tb-class="isRead:highlighted;isNew:red"></div>`);
+    const el = await fixture(`<div px-class="isRead:highlighted;isNew:red"></div>`);
 
     observer = new ClassObserver(el, { isRead: true, isNew: true }, 'main', 'item');
 
@@ -89,7 +89,7 @@ describe('tb-class attribute', () => {
   });
   
   it('should reapply the classes when data changes', async () => {
-    const el = await fixture(`<div tb-class="isRead:highlighted;isNew:red"></div>`);
+    const el = await fixture(`<div px-class="isRead:highlighted;isNew:red"></div>`);
 
     observer = new ClassObserver(el, { isRead: true, isNew: true }, 'main', 'item');
 
@@ -103,7 +103,7 @@ describe('tb-class attribute', () => {
   });
   
   it('should apply classnames when element is nested in target node', async () => {
-    const el = await fixture(`<div><div><div id="my-div" tb-class="isRead:highlighted"></div></div></div>`);
+    const el = await fixture(`<div><div><div id="my-div" px-class="isRead:highlighted"></div></div></div>`);
 
     observer = new ClassObserver(el, { isRead: true }, 'main', 'item');
 
@@ -115,7 +115,7 @@ describe('tb-class attribute', () => {
     
     observer = new ClassObserver(parent, { isRead: true }, 'main', 'item');
 
-    const el = await fixture('<div id="my-div" tb-class="isRead:highlighted"></div>', { parentNode: parent });
+    const el = await fixture('<div id="my-div" px-class="isRead:highlighted"></div>', { parentNode: parent });
 
     expect(el.className).toContain('highlighted');
   });
@@ -125,7 +125,7 @@ describe('tb-class attribute', () => {
     
     observer = new ClassObserver(parent, { isRead: true }, 'main', 'item');
 
-    const el = await fixture('<div><div id="my-div" tb-class="isRead:highlighted"></div></div>', { parentNode: parent });
+    const el = await fixture('<div><div id="my-div" px-class="isRead:highlighted"></div></div>', { parentNode: parent });
 
     expect(el.querySelector('#my-div')?.className).toContain('highlighted');
   });
@@ -137,7 +137,7 @@ describe('tb-class attribute', () => {
 
     const div = el.querySelector('#my-div');
 
-    div?.setAttribute('tb-class', 'isRead:highlighted')
+    div?.setAttribute('px-class', 'isRead:highlighted')
 
     if (div) {
       await elementUpdated(div);
@@ -147,13 +147,13 @@ describe('tb-class attribute', () => {
   });
   
   it('should a different class name when attribute is changed', async () => {
-    const el = await fixture(`<div><div><div tb-class="isRead:highlighted" id="my-div"></div></div></div>`);
+    const el = await fixture(`<div><div><div px-class="isRead:highlighted" id="my-div"></div></div></div>`);
     
     observer = new ClassObserver(el, { isRead: true }, 'main', 'item');
 
     const div = el.querySelector('#my-div');
 
-    div?.setAttribute('tb-class', 'isRead:foo;isNew:highlighted')
+    div?.setAttribute('px-class', 'isRead:foo;isNew:highlighted')
 
     if (div) {
       await elementUpdated(div);

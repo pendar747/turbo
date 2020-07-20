@@ -1,13 +1,13 @@
 import { customElement, html } from 'lit-element';
-import TurboComponent from "./TurboComponent";
+import PernixComponent from "./PernixComponent";
 import { Route } from '..';
 import { on } from '../util';
 
-@customElement('tb-switch')
-export default class Switch extends TurboComponent {
+@customElement('px-switch')
+export default class Switch extends PernixComponent {
 
   private get routes (): Route[] {
-    return Array.from(this.querySelectorAll('tb-route'));
+    return Array.from(this.querySelectorAll('px-route'));
   }
   
   private onPageChange = async () => {

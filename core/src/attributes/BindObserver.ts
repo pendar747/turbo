@@ -9,7 +9,7 @@ class BindObserver extends AttributeObserver {
   getters: string[] = [];
 
   constructor (targetNode: any, data: any, stateName: string, model: string) {
-    super(targetNode, data, 'tb-bind', stateName, model);
+    super(targetNode, data, 'px-bind', stateName, model);
     this.observe();
   }
   
@@ -22,7 +22,7 @@ class BindObserver extends AttributeObserver {
 
   applyChanges (elements: Element[], data: any) {
     elements.forEach(element => {
-      const matches = getValueList(element.getAttribute('tb-bind'))
+      const matches = getValueList(element.getAttribute('px-bind'))
         .map(({ property, value }) => ({ property, attributeNames: value.split(',')}))
 
       this.addNewGetters(matches.map(({ property }) => property));

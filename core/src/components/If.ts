@@ -1,9 +1,9 @@
 import { customElement, html } from "lit-element";
-import TurboComponent from "./TurboComponent";
+import PernixComponent from "./PernixComponent";
 import { fire, on } from "../util";
 
-@customElement('tb-if')
-export default class If extends TurboComponent {
+@customElement('px-if')
+export default class If extends PernixComponent {
   
   dispatchGetters () {
     if (this.stateName) {

@@ -2,7 +2,7 @@ import { fixture, elementUpdated } from "@open-wc/testing-helpers";
 import { on } from "../util";
 import ActionObserver from './ActionObserver';
 
-describe('tb-action attribute', () => {
+describe('px-action attribute', () => {
 
   let observer: ActionObserver;
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe('tb-action attribute', () => {
   it('should fire the event bound to the element', async () => {
     const callback = jasmine.createSpy();
     on('main-action', callback);
-    const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event">click</button>`);
+    const el: HTMLButtonElement = await fixture(`<button px-action="click:my-event">click</button>`);
     el.dispatchEvent(new MouseEvent('click'));
 
     expect(callback.calls.count()).toEqual(1);
@@ -31,7 +31,7 @@ describe('tb-action attribute', () => {
     const callback = jasmine.createSpy();
     const highlight = jasmine.createSpy();
     on('main-action', callback);
-    const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event-2;mouseover:highlight">click</button>`);
+    const el: HTMLButtonElement = await fixture(`<button px-action="click:my-event-2;mouseover:highlight">click</button>`);
     el.dispatchEvent(new MouseEvent('click'));
     el.dispatchEvent(new MouseEvent('mouseover'));
 
@@ -51,8 +51,8 @@ describe('tb-action attribute', () => {
   it('should fire a different event when action attribute is changed', async () => {
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
-    const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event-3">click</button>`);
-    el.setAttribute('tb-action', 'click:my-other-event');
+    const el: HTMLButtonElement = await fixture(`<button px-action="click:my-event-3">click</button>`);
+    el.setAttribute('px-action', 'click:my-other-event');
     await elementUpdated(el);
     el.dispatchEvent(new MouseEvent('click'));
 
@@ -67,8 +67,8 @@ describe('tb-action attribute', () => {
   it('should fire an extra event when an action attribute is added', async () => {
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
-    const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event-3">click</button>`);
-    el.setAttribute('tb-action', 'click:my-other-event;mouseover:my-event-3');
+    const el: HTMLButtonElement = await fixture(`<button px-action="click:my-event-3">click</button>`);
+    el.setAttribute('px-action', 'click:my-other-event;mouseover:my-event-3');
     await elementUpdated(el);
     el.dispatchEvent(new MouseEvent('click'));
     el.dispatchEvent(new MouseEvent('mouseover'));
@@ -89,7 +89,7 @@ describe('tb-action attribute', () => {
   it('should only fire the event once if registered twice', async () => {
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
-    const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event-3;click:my-event-3">click</button>`);
+    const el: HTMLButtonElement = await fixture(`<button px-action="click:my-event-3;click:my-event-3">click</button>`);
     el.dispatchEvent(new MouseEvent('click'));
 
     expect(myEventCallback.calls.count()).toEqual(1);
@@ -103,8 +103,8 @@ describe('tb-action attribute', () => {
   it('should not fire the event when attribute is removed', async () => {
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
-    const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event-3">click</button>`);
-    el.removeAttribute('tb-action');
+    const el: HTMLButtonElement = await fixture(`<button px-action="click:my-event-3">click</button>`);
+    el.removeAttribute('px-action');
     await elementUpdated(el);
     el.dispatchEvent(new MouseEvent('click'));
 
@@ -114,7 +114,7 @@ describe('tb-action attribute', () => {
   it('should fire the same user event for each dom event that it is assigned to', async () => {
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
-    const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event-3;mouseover:my-event-3">click</button>`);
+    const el: HTMLButtonElement = await fixture(`<button px-action="click:my-event-3;mouseover:my-event-3">click</button>`);
     el.dispatchEvent(new MouseEvent('click'));
     el.dispatchEvent(new MouseEvent('mouseover'));
 
@@ -137,7 +137,7 @@ describe('tb-action attribute', () => {
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
-    const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event-3">click</button>`);
+    const el: HTMLButtonElement = await fixture(`<button px-action="click:my-event-3">click</button>`);
     el.dispatchEvent(new MouseEvent('click'));
 
     expect(myEventCallback.calls.count()).toEqual(1);
@@ -154,7 +154,7 @@ describe('tb-action attribute', () => {
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
-    const el: HTMLButtonElement = await fixture(`<button tb-action="click:my-event-3;mouseover:my-event-2">click</button>`);
+    const el: HTMLButtonElement = await fixture(`<button px-action="click:my-event-3;mouseover:my-event-2">click</button>`);
     el.dispatchEvent(new MouseEvent('click'));
     el.dispatchEvent(new MouseEvent('mouseover'));
 
@@ -177,7 +177,7 @@ describe('tb-action attribute', () => {
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
-    const el: HTMLButtonElement = await fixture(`<button data-latency="3ms" tb-action="click:my-event-3">click</button>`);
+    const el: HTMLButtonElement = await fixture(`<button data-latency="3ms" px-action="click:my-event-3">click</button>`);
     el.dispatchEvent(new MouseEvent('click'));
 
     expect(myEventCallback.calls.count()).toEqual(1);
@@ -196,7 +196,7 @@ describe('tb-action attribute', () => {
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
-    const el: HTMLButtonElement = await fixture(`<button data-latency="3ms" tb-action="click:my-event-3;mouseover:my-event-2">click</button>`);
+    const el: HTMLButtonElement = await fixture(`<button data-latency="3ms" px-action="click:my-event-3;mouseover:my-event-2">click</button>`);
     el.dispatchEvent(new MouseEvent('click'));
     el.dispatchEvent(new MouseEvent('mouseover'));
 
@@ -225,7 +225,7 @@ describe('tb-action attribute', () => {
     
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
-    const el: HTMLButtonElement = await fixture(`<input value="Pete" tb-action="keyup:my-event-3">`);
+    const el: HTMLButtonElement = await fixture(`<input value="Pete" px-action="keyup:my-event-3">`);
     el.dispatchEvent(new KeyboardEvent('keyup'));
 
     expect(myEventCallback.calls.count()).toEqual(1);

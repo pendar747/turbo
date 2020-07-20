@@ -30,15 +30,15 @@ describe('render content', () => {
   });
   
   it('should print the keyword "this" as html friendly json', () => {
-    const template = '<span>{name}</span><tb-render template="template-id" value="{this}"></tb-render>';
+    const template = '<span>{name}</span><px-render template="template-id" value="{this}"></px-render>';
     const output = parseTemplate(template).render({ name: 'John', city: 'London', food: 'pancakes' });
-    expect(output).toBe('<span>John</span><tb-render template="template-id" value="{\'name\':\'John\',\'city\':\'London\',\'food\':\'pancakes\'}"></tb-render>');
+    expect(output).toBe('<span>John</span><px-render template="template-id" value="{\'name\':\'John\',\'city\':\'London\',\'food\':\'pancakes\'}"></px-render>');
   });
   
   it('should print an object property as html friendly json', () => {
-    const template = '<span>{name}</span><tb-render template="template-id" value="{stuff}"></tb-render>';
+    const template = '<span>{name}</span><px-render template="template-id" value="{stuff}"></px-render>';
     const output = parseTemplate(template).render({ name: 'John', city: 'London', stuff: { food: 'pancakes', desert: 'cheese' } });
-    expect(output).toBe('<span>John</span><tb-render template="template-id" value="{\'food\':\'pancakes\',\'desert\':\'cheese\'}"></tb-render>');
+    expect(output).toBe('<span>John</span><px-render template="template-id" value="{\'food\':\'pancakes\',\'desert\':\'cheese\'}"></px-render>');
   });
 
   it('should omit null and undefined property values', () => {

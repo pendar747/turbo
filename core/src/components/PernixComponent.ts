@@ -2,7 +2,7 @@ import { LitElement, property } from "lit-element";
 import { on } from "../util";
 import get from 'lodash-es/get';
 
-export default abstract class TurboComponent extends LitElement {
+export default abstract class PernixComponent extends LitElement {
 
   @property()
   context: string|null = null;

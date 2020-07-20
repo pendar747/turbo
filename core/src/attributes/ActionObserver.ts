@@ -30,7 +30,7 @@ class ActionObserver extends AttributeObserver {
   registeredElements = new Map<Element, Map<string, { userEvent: string, handler: (e: Event) => any }>>();
 
   constructor(targetNode: Element|ShadowRoot, stateName: string, model: string) {
-    super(targetNode, undefined, 'tb-action', stateName, model);
+    super(targetNode, undefined, 'px-action', stateName, model);
     this.registeredElements = new Map();
     this.observe();
   }
@@ -66,7 +66,7 @@ class ActionObserver extends AttributeObserver {
   }
 
   /**
-   * Removes all handlers that are no longer in the tb-action attribute
+   * Removes all handlers that are no longer in the px-action attribute
    * @param param0 element and event Descs that belongs to it
    */
   removeUnassignedDescs ({ el, eventDescs }: { el: Element, eventDescs: EventDesc[] }) {
@@ -89,7 +89,7 @@ class ActionObserver extends AttributeObserver {
     ]);
 
     const actionBindings: ActionBinding[] = elements.map((el) => {
-      const action = el.getAttribute('tb-action');
+      const action = el.getAttribute('px-action');
       return {
         eventDescs: getEventDescriptions(action ?? ''),
         el,

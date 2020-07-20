@@ -1,5 +1,5 @@
 import { customElement, html, property } from "lit-element";
-import TurboComponent from "./TurboComponent";
+import PernixComponent from "./PernixComponent";
 import parseTemplate from "./parseTemplate";
 import ActionObserver from "../attributes/ActionObserver";
 import { fire, on } from "../util";
@@ -9,8 +9,8 @@ import BindPropObserver from "../attributes/BindPropObserver";
 import observeAnchors from "./observeAnchors";
 import isNil from 'lodash-es/isNil';
 
-@customElement('tb-render')
-export default class Render extends TurboComponent {
+@customElement('px-render')
+export default class Render extends PernixComponent {
   @property()
   template: string|null = null;
 
@@ -44,7 +44,7 @@ export default class Render extends TurboComponent {
       return;
     }
     return this.value.map((valueItem: any, index: number) => {
-      return html`<tb-render no-context model="${this.fullModelPath}[${index}]" template="${this.template}"></tb-render>`
+      return html`<px-render no-context model="${this.fullModelPath}[${index}]" template="${this.template}"></px-render>`
     })
   }
 
@@ -93,8 +93,8 @@ export default class Render extends TurboComponent {
 
   updated (changedProps: any) {
     const renderElements = [
-      ...Array.from(this.shadowRoot?.querySelectorAll('tb-render') ?? []),
-      ...Array.from(this.shadowRoot?.querySelectorAll('tb-route') ?? [])
+      ...Array.from(this.shadowRoot?.querySelectorAll('px-render') ?? []),
+      ...Array.from(this.shadowRoot?.querySelectorAll('px-route') ?? [])
     ];
     renderElements.forEach(el => {
       if (!el.hasAttribute('context') && !el.hasAttribute('no-context')) {
@@ -123,11 +123,11 @@ export default class Render extends TurboComponent {
         : '';
 
     if (this.if) {
-      return html`<tb-if context="${this.fullModelPath}" model="${this.if}">${content}</tb-if>`;
+      return html`<px-if context="${this.fullModelPath}" model="${this.if}">${content}</px-if>`;
     }
 
     if (this.unless) {
-      return html`<tb-unless context="${this.fullModelPath}" model="${this.unless}">${content}</tb-unless>`;
+      return html`<px-unless context="${this.fullModelPath}" model="${this.unless}">${content}</px-unless>`;
     }
     
     return content;

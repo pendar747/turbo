@@ -13,7 +13,7 @@ describe('Render', () => {
       sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
       await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
       const parent = await fixture(`<div state="main"></div>`);
-      el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+      el = await fixture(`<px-render template="my-template" model="profile"></px-render>`, { parentNode: parent });
     });
     
     it('should render the content', () => {
@@ -31,7 +31,7 @@ describe('Render', () => {
     sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
     await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+    const el = await fixture(`<px-render template="my-template" model="profile"></px-render>`, { parentNode: parent });
 
     expect(el.shadowRoot?.textContent).toEqual('My name is Mike and I live in New York.');
     fire('main-state-update', { state: { profile: { name: 'Mike', city: 'Tokyo' } } });
@@ -59,16 +59,16 @@ describe('Render', () => {
       sessionStorage.setItem('list', JSON.stringify(state));
       await fixture('<template id="my-template">My name is {name} and I live in {city}.</template>')
       const parent = await fixture(`<div state="list"></div>`);
-      el = await fixture(`<tb-render repeat template="my-template" model="profiles"></tb-render>`, { parentNode: parent });
+      el = await fixture(`<px-render repeat template="my-template" model="profiles"></px-render>`, { parentNode: parent });
     });
     
     it('should render a list when repeat attribute is set', async () => {
-      expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(3);
-      expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(1)')?.shadowRoot?.textContent)
+      expect(el.shadowRoot?.querySelectorAll('px-render').length).toEqual(3);
+      expect(el.shadowRoot?.querySelector('px-render:nth-of-type(1)')?.shadowRoot?.textContent)
         .toEqual('My name is Mike and I live in New York.');
-      expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
+      expect(el.shadowRoot?.querySelector('px-render:nth-of-type(2)')?.shadowRoot?.textContent)
         .toEqual('My name is Jimmy and I live in Boston.');
-      expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(3)')?.shadowRoot?.textContent)
+      expect(el.shadowRoot?.querySelector('px-render:nth-of-type(3)')?.shadowRoot?.textContent)
         .toEqual('My name is Raj and I live in Bangalore.');
     });
 
@@ -97,7 +97,7 @@ describe('Render', () => {
         }
       });
       
-      expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
+      expect(el.shadowRoot?.querySelector('px-render:nth-of-type(2)')?.shadowRoot?.textContent)
         .toEqual('My name is Bumpzy and I live in Greenwich.');
     });
     
@@ -114,8 +114,8 @@ describe('Render', () => {
         }
       });
 
-      expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(2);
-      expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
+      expect(el.shadowRoot?.querySelectorAll('px-render').length).toEqual(2);
+      expect(el.shadowRoot?.querySelector('px-render:nth-of-type(2)')?.shadowRoot?.textContent)
         .toEqual('My name is Raj and I live in Bangalore.');
     });
     
@@ -140,8 +140,8 @@ describe('Render', () => {
 
       await elementUpdated(el);
       
-      expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(4);
-      expect(el.shadowRoot?.querySelector('tb-render:last-of-type')?.shadowRoot?.textContent)
+      expect(el.shadowRoot?.querySelectorAll('px-render').length).toEqual(4);
+      expect(el.shadowRoot?.querySelector('px-render:last-of-type')?.shadowRoot?.textContent)
         .toEqual('My name is Emanuel and I live in Vienna.');
     });
 
@@ -150,11 +150,11 @@ describe('Render', () => {
   
   it('should fire an event for the given model', async () => {
     sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
-    await fixture('<template id="my-template"><button tb-action="click:click-me" id="my-button">click me</button></template>')
+    await fixture('<template id="my-template"><button px-action="click:click-me" id="my-button">click me</button></template>')
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+    const el = await fixture(`<px-render template="my-template" model="profile"></px-render>`, { parentNode: parent });
 
-    expect(el.shadowRoot?.innerHTML).toEqual('<!----><div id="container"><button tb-action="click:click-me" id="my-button">click me</button></div><!---->');
+    expect(el.shadowRoot?.innerHTML).toEqual('<!----><div id="container"><button px-action="click:click-me" id="my-button">click me</button></div><!---->');
 
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
@@ -178,14 +178,14 @@ describe('Render', () => {
         } 
       } 
     }));
-    await fixture('<template id="my-template"><button tb-action="click:click-me" id="my-button">click me</button></template>')
-    await fixture('<template id="template-2"><tb-render model="city" template="my-template"></tb-render></template>')
+    await fixture('<template id="my-template"><button px-action="click:click-me" id="my-button">click me</button></template>')
+    await fixture('<template id="template-2"><px-render model="city" template="my-template"></px-render></template>')
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render template="template-2" model="profile"></tb-render>`, { parentNode: parent });
+    const el = await fixture(`<px-render template="template-2" model="profile"></px-render>`, { parentNode: parent });
 
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
-    el.shadowRoot?.querySelector('tb-render')?.shadowRoot?.getElementById('my-button')?.dispatchEvent(new MouseEvent('click'));
+    el.shadowRoot?.querySelector('px-render')?.shadowRoot?.getElementById('my-button')?.dispatchEvent(new MouseEvent('click'));
     
     expect(myEventCallback.calls.count()).toEqual(1);
     expect(myEventCallback.calls.argsFor(0)[0].detail).toEqual({ 
@@ -197,9 +197,9 @@ describe('Render', () => {
   
   it('should fire an event for the given model with the data that is attached to the element', async () => {
     sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
-    await fixture('<template id="my-template"><button data-name="{name}" tb-action="click:click-me" id="my-button">click me</button></template>')
+    await fixture('<template id="my-template"><button data-name="{name}" px-action="click:click-me" id="my-button">click me</button></template>')
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+    const el = await fixture(`<px-render template="my-template" model="profile"></px-render>`, { parentNode: parent });
 
     const myEventCallback = jasmine.createSpy();
     on('main-action', myEventCallback);
@@ -217,9 +217,9 @@ describe('Render', () => {
   
   it('should update the model and render with the fired event', async () => {
     sessionStorage.setItem('main', JSON.stringify({ profile: { name: 'Mike', city: 'New York' } }));
-    await fixture('<template id="my-template"><span>{name}</span><input tb-action="keyup:setName" id="my-input" /></template>')
+    await fixture('<template id="my-template"><span>{name}</span><input px-action="keyup:setName" id="my-input" /></template>')
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+    const el = await fixture(`<px-render template="my-template" model="profile"></px-render>`, { parentNode: parent });
     on('main-action', (event) => {
       const newState = {
         profile: {
@@ -235,7 +235,7 @@ describe('Render', () => {
 
     await elementUpdated(el);
     
-    expect(el.shadowRoot?.innerHTML).toEqual('<!----><div id="container"><span>David</span><input tb-action="keyup:setName" id="my-input"></div><!---->');
+    expect(el.shadowRoot?.innerHTML).toEqual('<!----><div id="container"><span>David</span><input px-action="keyup:setName" id="my-input"></div><!---->');
   });
 
   it('should render with context', async () => {
@@ -255,12 +255,12 @@ describe('Render', () => {
     ));
     await fixture('<template id="my-template"><span>{name} lives in {city}</span></template>')
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render repeat context="profile" template="my-template" model="friends"></tb-render>`, { parentNode: parent });
+    const el = await fixture(`<px-render repeat context="profile" template="my-template" model="friends"></px-render>`, { parentNode: parent });
 
-    expect(el.shadowRoot?.querySelectorAll('tb-render').length).toEqual(2);
-    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(1)')?.shadowRoot?.textContent)
+    expect(el.shadowRoot?.querySelectorAll('px-render').length).toEqual(2);
+    expect(el.shadowRoot?.querySelector('px-render:nth-of-type(1)')?.shadowRoot?.textContent)
       .toEqual('Steve lives in Berlin');
-    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
+    expect(el.shadowRoot?.querySelector('px-render:nth-of-type(2)')?.shadowRoot?.textContent)
       .toEqual('James lives in London');
   });
 
@@ -284,18 +284,18 @@ describe('Render', () => {
       <span>{name} lives in {city}</span>
       <div>
         <h2>friends</h2>
-        <tb-render repeat template="my-template" model="friends"></tb-render>
+        <px-render repeat template="my-template" model="friends"></px-render>
       </div>
     </template>`)
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+    const el = await fixture(`<px-render template="my-template" model="profile"></px-render>`, { parentNode: parent });
 
-    const nestedRender = el.shadowRoot?.querySelector('tb-render');
+    const nestedRender = el.shadowRoot?.querySelector('px-render');
 
-    expect(nestedRender?.shadowRoot?.querySelectorAll('tb-render').length).toEqual(2);
-    expect(nestedRender?.shadowRoot?.querySelector('tb-render:nth-of-type(1)')?.shadowRoot?.textContent)
+    expect(nestedRender?.shadowRoot?.querySelectorAll('px-render').length).toEqual(2);
+    expect(nestedRender?.shadowRoot?.querySelector('px-render:nth-of-type(1)')?.shadowRoot?.textContent)
       .toContain('Steve lives in Berlin');
-    expect(nestedRender?.shadowRoot?.querySelector('tb-render:nth-of-type(2)')?.shadowRoot?.textContent)
+    expect(nestedRender?.shadowRoot?.querySelector('px-render:nth-of-type(2)')?.shadowRoot?.textContent)
       .toContain('James lives in London');
   });
    
@@ -319,12 +319,12 @@ describe('Render', () => {
     await fixture(`<template id="nested">{name} just moved to this city!</template>`)
     await fixture(`<template id="my-template">
       <span>{name} lives in {city}</span>
-      <tb-render if="justMovedToCity" template="nested"></tb-render>
+      <px-render if="justMovedToCity" template="nested"></px-render>
     </template>`)
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+    const el = await fixture(`<px-render template="my-template" model="profile"></px-render>`, { parentNode: parent });
 
-    const nestedRender = el.shadowRoot?.querySelector('tb-render');
+    const nestedRender = el.shadowRoot?.querySelector('px-render');
 
     expect(nestedRender?.shadowRoot?.innerHTML)
       .toContain('Mike just moved to this city!');
@@ -351,15 +351,15 @@ describe('Render', () => {
     await fixture('<template id="city">{name} has a population of {population} people.</template>');
     await fixture(`<template id="my-template">
       <span>My name is {name}</span>
-      <tb-render template="city" model="city"></tb-render>
+      <px-render template="city" model="city"></px-render>
     </template>`)
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render repeat template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+    const el = await fixture(`<px-render repeat template="my-template" model="profile"></px-render>`, { parentNode: parent });
 
-    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(1)')
-      ?.shadowRoot?.querySelector('tb-render')?.shadowRoot?.textContent).toEqual('London has a population of 10000000 people.');
-    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')
-      ?.shadowRoot?.querySelector('tb-render')?.shadowRoot?.textContent).toEqual('New York has a population of 18000000 people.');
+    expect(el.shadowRoot?.querySelector('px-render:nth-of-type(1)')
+      ?.shadowRoot?.querySelector('px-render')?.shadowRoot?.textContent).toEqual('London has a population of 10000000 people.');
+    expect(el.shadowRoot?.querySelector('px-render:nth-of-type(2)')
+      ?.shadowRoot?.querySelector('px-render')?.shadowRoot?.textContent).toEqual('New York has a population of 18000000 people.');
   });
 
    
@@ -388,18 +388,18 @@ describe('Render', () => {
     await fixture('<template id="city">{name} has a population of {population} people.</template>');
     await fixture(`<template id="my-template">
       <span>My name is {name}</span>
-      <tb-render template="city" no-context model="mainCity"></tb-render>
+      <px-render template="city" no-context model="mainCity"></px-render>
     </template>`)
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render repeat template="my-template" model="profile"></tb-render>`, { parentNode: parent });
+    const el = await fixture(`<px-render repeat template="my-template" model="profile"></px-render>`, { parentNode: parent });
 
-    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(1)')
-      ?.shadowRoot?.querySelector('tb-render')?.shadowRoot?.textContent).toEqual('Los Angeles has a population of 10 people.');
-    expect(el.shadowRoot?.querySelector('tb-render:nth-of-type(2)')
-      ?.shadowRoot?.querySelector('tb-render')?.shadowRoot?.textContent).toEqual('Los Angeles has a population of 10 people.');
+    expect(el.shadowRoot?.querySelector('px-render:nth-of-type(1)')
+      ?.shadowRoot?.querySelector('px-render')?.shadowRoot?.textContent).toEqual('Los Angeles has a population of 10 people.');
+    expect(el.shadowRoot?.querySelector('px-render:nth-of-type(2)')
+      ?.shadowRoot?.querySelector('px-render')?.shadowRoot?.textContent).toEqual('Los Angeles has a population of 10 people.');
   });
 
-  it('should assign classes with tb-class when a condition is true', async () => {
+  it('should assign classes with px-class when a condition is true', async () => {
     sessionStorage.setItem('main', JSON.stringify({
       task: {
         isDone: false,
@@ -419,10 +419,10 @@ describe('Render', () => {
           color: green;
         }
       </style>
-      <div id="my-div" tb-class="isDone:green,border;isNew:new-task">{task}</div>
+      <div id="my-div" px-class="isDone:green,border;isNew:new-task">{task}</div>
     </template>`)
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="task"></tb-render>`, { parentNode: parent });    
+    const el = await fixture(`<px-render template="my-template" model="task"></px-render>`, { parentNode: parent });    
 
     const div = el.shadowRoot?.querySelector('#my-div');
     if (div) {
@@ -453,17 +453,17 @@ describe('Render', () => {
   });
   
  
-  it('should assign attributes to elements that have the tb-bind attribute', async () => {
+  it('should assign attributes to elements that have the px-bind attribute', async () => {
     sessionStorage.setItem('main', JSON.stringify({
       profile: {
         name: 'steve'
       }
     }));
     await fixture(`<template id="my-template">
-      <input tb-bind="name:value" type="text"/>
+      <input px-bind="name:value" type="text"/>
     </template>`)
     const parent = await fixture(`<div state="main"></div>`);
-    const el = await fixture(`<tb-render template="my-template" model="profile"></tb-render>`, { parentNode: parent });    
+    const el = await fixture(`<px-render template="my-template" model="profile"></px-render>`, { parentNode: parent });    
 
     const input = el.shadowRoot?.querySelector('input');
     if (input) {

@@ -10,7 +10,7 @@ class BindPropObserver extends AttributeObserver {
   getters: string[] = [];
 
   constructor (targetNode: any, data: any, stateName: string, model: string) {
-    super(targetNode, data, 'tb-bind-prop', stateName, model);
+    super(targetNode, data, 'px-bind-prop', stateName, model);
     this.observe();
   }
   

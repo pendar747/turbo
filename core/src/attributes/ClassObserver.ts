@@ -8,7 +8,7 @@ class ClassObserver extends AttributeObserver {
   getters: string[] = [];
 
   constructor (targetNode: Element|ShadowRoot, data: any, stateName: string, model: string) {
-    super(targetNode, data, 'tb-class', stateName, model);
+    super(targetNode, data, 'px-class', stateName, model);
     this.observe();
   }
 
@@ -21,7 +21,7 @@ class ClassObserver extends AttributeObserver {
     
   applyChanges(elements: Element[], data: any) {
     elements.forEach(element => {
-      const matches = getValueList(element.getAttribute('tb-class'))
+      const matches = getValueList(element.getAttribute('px-class'))
         .map(({ property, value }) => ({ condition: property, classNames: value.split(',') }))
 
       this.addNewGetters(matches.map(({ condition }) => condition));

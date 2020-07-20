@@ -2,12 +2,12 @@ import Route from './Route';
 import { fixture, elementUpdated } from '@open-wc/testing-helpers';
 import { on, fire } from '../util';
 
-describe('tb-route', () => {
+describe('px-route', () => {
 
   describe('isMatching', () => {
     
     it('should return true if the route path matches the current page path', async () => {
-      const el: Route = await fixture(`<tb-route path="/user/:id"></tb-route>`);
+      const el: Route = await fixture(`<px-route path="/user/:id"></px-route>`);
 
       history.pushState(null, 'user profile', '/user/2');
       expect(el instanceof Route).toEqual(true);
@@ -15,7 +15,7 @@ describe('tb-route', () => {
     });
     
     it('should return false if the route path does not matches the current page path', async () => {
-      const el: Route = await fixture(`<tb-route path="/user/:id"></tb-route>`);
+      const el: Route = await fixture(`<px-route path="/user/:id"></px-route>`);
       history.pushState(null, 'user profile', '/looser/2');
       expect(el.isMatching()).toEqual(false);
     });
@@ -25,7 +25,7 @@ describe('tb-route', () => {
   describe('setSelected', () => {
 
     it('should render the slot when selected and matches the current page path', async () => {
-      const el: Route = await fixture(`<tb-route path="/user/:id"><p>user profile</p></tb-route>`);
+      const el: Route = await fixture(`<px-route path="/user/:id"><p>user profile</p></px-route>`);
       history.pushState(null, 'user profile', '/user/2');
       el.setSelected(true);
 
@@ -38,7 +38,7 @@ describe('tb-route', () => {
       const parent = await fixture('<div state="main"></div>');
       const handler = jasmine.createSpy();
       on('main-action', handler);
-      const el: Route = await fixture(`<tb-route action="myAction" path="/user/:id/post/:postId"><p>user profile</p></tb-route>`, { parentNode: parent });
+      const el: Route = await fixture(`<px-route action="myAction" path="/user/:id/post/:postId"><p>user profile</p></px-route>`, { parentNode: parent });
       history.pushState(null, 'user profile', '/user/2/post/4');
       el.setSelected(true);
 
@@ -52,7 +52,7 @@ describe('tb-route', () => {
     });
     
     it('should render empty when selected is set to false', async () => {
-      const el: Route = await fixture(`<tb-route path="/user/:id"><p>user profile</p></tb-route>`);
+      const el: Route = await fixture(`<px-route path="/user/:id"><p>user profile</p></px-route>`);
       history.pushState(null, 'user profile', '/looser/2');
       el.setSelected(false);
 
@@ -67,7 +67,7 @@ describe('tb-route', () => {
     const parent = await fixture('<div state="main"></div>');
     const handler = jasmine.createSpy();
     on('main-action', handler);
-    const el: Route = await fixture(`<tb-route action="myAction" path="/user/:id/post/:postId"><p>user profile</p></tb-route>`, { parentNode: parent });
+    const el: Route = await fixture(`<px-route action="myAction" path="/user/:id/post/:postId"><p>user profile</p></px-route>`, { parentNode: parent });
     history.pushState(null, 'user profile', '/user/2/post/4');
     el.setSelected(true);
 
@@ -106,7 +106,7 @@ describe('tb-route', () => {
       const handler = jasmine.createSpy();
       on('myApp-add-getters', handler);
       const parentNode = await fixture('<div state="myApp"></div>');
-      const el: Route = await fixture(`<tb-route context="list" model="item" path="/user/:id"></tb-route>`, { parentNode });
+      const el: Route = await fixture(`<px-route context="list" model="item" path="/user/:id"></px-route>`, { parentNode });
 
       expect(handler).toHaveBeenCalledTimes(3);
       expect(handler.calls.argsFor(2)[0].detail).toEqual(['list.item']);
@@ -115,7 +115,7 @@ describe('tb-route', () => {
 
     it('should dispatch getters when model or context change', async () => {
       const parentNode = await fixture('<div state="myApp"></div>');
-      const el: Route = await fixture(`<tb-route context="list" model="item" path="/user/:id"></tb-route>`, { parentNode });
+      const el: Route = await fixture(`<px-route context="list" model="item" path="/user/:id"></px-route>`, { parentNode });
       
       const handler = jasmine.createSpy();
       on('myApp-add-getters', handler);
@@ -134,7 +134,7 @@ describe('tb-route', () => {
     it('should dispatch getters after state is started', async () => {
       const handler = jasmine.createSpy();
       const parentNode = await fixture('<div state="myApp2"></div>');
-      const el: Route = await fixture(`<tb-route context="list" model="item" path="/user/:id"></tb-route>`, { parentNode });
+      const el: Route = await fixture(`<px-route context="list" model="item" path="/user/:id"></px-route>`, { parentNode });
       
       on('myApp2-add-getters', handler);
 

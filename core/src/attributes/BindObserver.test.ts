@@ -2,7 +2,7 @@ import { fixture } from "@open-wc/testing-helpers";
 import BindObserver from "./BindObserver";
 import { on } from "../util";
 
-describe('tb-bind', () => {
+describe('px-bind', () => {
 
   let observer: BindObserver;
   afterEach(() => {
@@ -10,14 +10,14 @@ describe('tb-bind', () => {
   });
 
   it('should set the values of the given attributes to the values defined in the model data', async () => {
-    const el = await fixture(`<input tb-bind="name:value" type="text" />`);
+    const el = await fixture(`<input px-bind="name:value" type="text" />`);
     observer = new BindObserver(el, { name: 'Dan' }, 'main', 'item');
 
     expect(el.getAttribute('value')).toEqual('Dan');
   });
   
   it('should update the attribute when the model data changes', async () => {
-    const el = await fixture(`<input tb-bind="name:value" type="text" />`);
+    const el = await fixture(`<input px-bind="name:value" type="text" />`);
     observer = new BindObserver(el, { name: 'Dan' }, 'main', 'item');
 
     observer.data = { name: 'James' };
@@ -25,7 +25,7 @@ describe('tb-bind', () => {
   });
   
   it('should be able to apply multiple attributes', async () => {
-    const el = await fixture(`<input tb-bind="name:value;defaultName:placeholder" type="text" />`);
+    const el = await fixture(`<input px-bind="name:value;defaultName:placeholder" type="text" />`);
     observer = new BindObserver(el, { name: 'Dan', defaultName: 'Asimov' }, 'main', 'item');
 
     expect(el.getAttribute('value')).toEqual('Dan');
@@ -33,7 +33,7 @@ describe('tb-bind', () => {
   });
   
   it('should omit attributes that are null or undefined or false', async () => {
-    const el = await fixture(`<input tb-bind="isSet:checked" type="checkbox" />`);
+    const el = await fixture(`<input px-bind="isSet:checked" type="checkbox" />`);
     observer = new BindObserver(el, { isSet: true }, 'main', 'item');
 
     expect(el.hasAttribute('checked')).toEqual(true);
@@ -55,7 +55,7 @@ describe('tb-bind', () => {
     const parent = await fixture('<div></div>');
     observer = new BindObserver(parent, { name: 'Pete' }, 'main', 'item');
 
-    const el = await fixture('<input tb-bind="name:value" />', { parentNode: parent });
+    const el = await fixture('<input px-bind="name:value" />', { parentNode: parent });
 
     expect(el.getAttribute('value')).toEqual('Pete');
   });
@@ -66,7 +66,7 @@ describe('tb-bind', () => {
 
     const eventHandler = jasmine.createSpy();
     on('main-add-getters', eventHandler);
-    const el: HTMLInputElement = await fixture('<input tb-bind="name:value;defaultName:placeholder" />', { parentNode: parent });
+    const el: HTMLInputElement = await fixture('<input px-bind="name:value;defaultName:placeholder" />', { parentNode: parent });
 
     expect(eventHandler.calls.argsFor(0)[0].detail).toEqual(['item.name', 'item.defaultName']);
   });

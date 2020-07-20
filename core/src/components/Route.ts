@@ -2,10 +2,10 @@ import { customElement, html, property } from "lit-element";
 import { fire, on } from "../util";
 import { match, MatchFunction, Match } from 'path-to-regexp';
 import observeAnchors from "./observeAnchors";
-import TurboComponent from "./TurboComponent";
+import PernixComponent from "./PernixComponent";
 
-@customElement('tb-route')
-export default class Route extends TurboComponent {
+@customElement('px-route')
+export default class Route extends PernixComponent {
 
   @property()
   path: string|undefined;
