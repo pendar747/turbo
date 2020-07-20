@@ -41,30 +41,5 @@ module.exports = [
       { format: 'cjs', file: './dist/index.js' },
       { format: 'es', file: './dist/index.module.js' }
     ]
-  },
-  {
-    input: 'src/modelAdapters/mobX/index.ts',
-    plugins: [
-      resolve(),
-      commonjs({
-        include: /node_modules/
-      }),
-      typescriptPlugin(),
-      jsonPlugin(),
-      css({
-        output: 'dist/default-theme.css',
-        include: 'src/styles/**/*.css'
-      }),
-      string({
-        include: "**/*.css"
-      }),
-      // visualizer({
-      //   filename: 'reports/bundle-analysis.html'
-      // })
-    ],
-    output: [
-      { format: 'cjs', file: './dist/modelAdapters/mobX/index.js' },
-      { format: 'es', file: './dist/modelAdapters/mobX/index.js' }
-    ]
   }
 ];

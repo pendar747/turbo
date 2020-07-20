@@ -1,4 +1,4 @@
-import { on, fire } from "../../util";
+import { on, fire } from "./util";
 import { MessageData } from "./types";
 
 /**

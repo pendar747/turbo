@@ -2,7 +2,7 @@ import { autorun, observable } from 'mobx';
 
 import get from 'lodash-es/get';
 import { MessageData } from './types';
-import getRequestedState from '../getRequestedState';
+import getRequestedState from './getRequestedState';
 
 const registerState = (stateName: string) => (StateClass: any) => {
   const state = new StateClass();

@@ -1,20 +1,17 @@
 {
-  "name": "@pendar/turbo",
-  "version": "0.1.1",
-  "main": "./index.js",
-  "module": "./index.module.js",
+  "name": "@pernix/mobx-adapter",
+  "version": "0.0.5",
+  "description": "MobX Adapter for Pernix framework",
+  "main": "dist/index.js",
+  "author": "Pendar Ghalamchi",
   "license": "MIT",
+  "private": false,
   "scripts": {
     "build": "rm -rf ./dist && rollup -c rollup.config.js",
-    "start": "static-server ./public",
-    "test": "karma start karma.conf.js",
-    "prepublish": "npm run build && cd dist"
+    "test": "karma start karma.conf.js"
   },
-  "dependencies": {
-    "axios": "^0.19.2",
-    "lodash-es": "^4.17.15",
-    "mobx": "^5.15.4",
-    "path-to-regexp": "^6.1.0"
+  "peerDependencies": {
+    "mobx": "^5.15.4"
   },
   "devDependencies": {
     "@open-wc/karma-esm": "^2.16.5",
@@ -23,37 +20,28 @@
     "@rollup/plugin-json": "^4.0.3",
     "@rollup/plugin-node-resolve": "^7.1.3",
     "@rollup/plugin-typescript": "^4.1.1",
-    "@types/classnames": "^2.2.9",
-    "@types/highlight.js": "^9.12.3",
     "@types/jasmine": "^3.5.10",
     "@types/lodash-es": "^4.17.3",
     "@types/node": "^13.11.0",
-    "@types/string-template": "^1.0.2",
     "copy-webpack-plugin": "^5.1.1",
-    "css-loader": "^3.4.2",
-    "deepmerge": "^4.2.2",
     "jasmine-core": "^3.5.0",
-    "jsdom": "^16.0.1",
     "karma": "^5.0.4",
     "karma-chrome-launcher": "^3.1.0",
     "karma-jasmine": "^3.1.1",
     "karma-jasmine-html-reporter": "^1.5.4",
     "karma-rollup-preprocessor": "^7.0.5",
     "karma-sourcemap-loader": "^0.3.7",
-    "parcel": "^1.12.4",
-    "raw-loader": "^4.0.0",
+    "mobx": "^5.15.4",
     "rollup": "^2.6.1",
     "rollup-plugin-copy": "^3.3.0",
     "rollup-plugin-css-only": "^2.0.0",
     "rollup-plugin-string": "^3.0.0",
     "rollup-plugin-typescript2": "^0.27.0",
     "rollup-plugin-visualizer": "^4.0.4",
-    "static-server": "^2.2.1",
-    "style-loader": "^1.1.3",
-    "ts-loader": "^6.2.1",
     "tslib": "^1.11.1",
-    "typescript": "^3.8.3",
-    "webpack": "^5.0.0-beta.13",
-    "webpack-cli": "^3.3.10"
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "lodash-es": "^4.17.15"
   }
 }
