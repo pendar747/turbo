@@ -5,6 +5,7 @@ const resolve = require('@rollup/plugin-node-resolve');
 const commonjs = require('@rollup/plugin-commonjs');
 const { string } = require('rollup-plugin-string');
 const css = require('rollup-plugin-css-only');
+const copy = require('rollup-plugin-copy');
 const visualizer = require('rollup-plugin-visualizer');
 
 module.exports = [
@@ -24,13 +25,21 @@ module.exports = [
       string({
         include: "**/*.css"
       }),
+      copy({
+        targets: [
+          {
+            src: './package.json',
+            dest: './dist'
+          }
+        ]
+      })
       // visualizer({
       //   filename: 'reports/bundle-analysis.html'
       // })
     ],
     output: [
-      { format: 'cjs', file: pkg.main },
-      { format: 'es', file: pkg.module }
+      { format: 'cjs', file: './dist/index.js' },
+      { format: 'es', file: './dist/index.module.js' }
     ]
   },
   {
@@ -54,8 +63,8 @@ module.exports = [
       // })
     ],
     output: [
-      { format: 'cjs', file: 'dist/mobxAdapter.js' },
-      { format: 'es', file: 'dist/mobxAdapter.module.js' }
+      { format: 'cjs', file: './dist/modelAdapters/mobX/index.js' },
+      { format: 'es', file: './dist/modelAdapters/mobX/index.js' }
     ]
   }
 ];

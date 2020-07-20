@@ -1,17 +1,14 @@
 {
-  "name": "turbo",
-  "version": "0.0.1",
-  "main": "dist/index.js",
-  "module": "dist/index.module.js",
+  "name": "@pendar/turbo",
+  "version": "0.1.0",
+  "main": "./index.js",
+  "module": "./index.module.js",
   "license": "MIT",
   "scripts": {
-    "build": "rm -rf public/dist && rollup -c rollup.config.js",
+    "build": "rm -rf ./dist && rollup -c rollup.config.js",
     "start": "static-server ./public",
     "test": "karma start karma.conf.js"
   },
-  "files": [
-    "dist/**/*"
-  ],
   "dependencies": {
     "axios": "^0.19.2",
     "lodash-es": "^4.17.15",
@@ -45,6 +42,7 @@
     "parcel": "^1.12.4",
     "raw-loader": "^4.0.0",
     "rollup": "^2.6.1",
+    "rollup-plugin-copy": "^3.3.0",
     "rollup-plugin-css-only": "^2.0.0",
     "rollup-plugin-string": "^3.0.0",
     "rollup-plugin-typescript2": "^0.27.0",
