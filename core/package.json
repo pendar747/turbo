@@ -1,6 +1,6 @@
 {
   "name": "@pernix/core",
-  "version": "0.1.2",
+  "version": "0.2.2",
   "main": "./index.js",
   "module": "./index.module.js",
   "license": "MIT",
