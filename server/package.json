@@ -2,7 +2,7 @@
   "name": "@pernix/server",
   "version": "0.0.1",
   "description": "Node server to run Pernix applications",
-  "main": "index.js",
+  "main": "dist/index.js",
   "author": "Pendar Ghalamchi",
   "license": "MIT",
   "private": false,
