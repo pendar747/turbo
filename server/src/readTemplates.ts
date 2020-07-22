@@ -1,10 +1,8 @@
 import fs from 'fs';
-import path, { resolve } from 'path';
+import path from 'path';
 import { JSDOM } from 'jsdom';
-
-export type TemplateMap = Map<string, Map<string, string>>;
-
-const MAIN_TEMPLATE_KEY = 'main';
+import { TemplateMap } from './types';
+import { MAIN_TEMPLATE_KEY } from './constants';
 
 const readFile = async (map: TemplateMap, basePath: string, filename: string) => {
   return new Promise((resolve, reject) => {
@@ -14,8 +12,8 @@ const readFile = async (map: TemplateMap, basePath: string, filename: string) =>
       }
       const dom = new JSDOM(result);
       // TODO: what happens if template file has more than one unnamed template in it?
-      const templates: [string, string][] = Array.from(dom.window.document.querySelectorAll('template') || [])
-        .map(template => [template.id || MAIN_TEMPLATE_KEY, template.outerHTML]);
+      const templates: [string, Element][] = Array.from(dom.window.document.querySelectorAll('template') || [])
+        .map(template => [template.id || MAIN_TEMPLATE_KEY, template]);
       map.set(path.join(basePath, filename), new Map(templates));
       resolve();
     });
