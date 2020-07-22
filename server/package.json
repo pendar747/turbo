@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "author": "Pendar Ghalamchi",
   "license": "MIT",
-  "private": false,
+  "bin": {
+    "serve-pernix": "./dist/serve.js"
+  },
   "devDependencies": {
     "typescript": "^3.9.7"
   },

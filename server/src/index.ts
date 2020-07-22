@@ -31,13 +31,3 @@ import express from 'express';
 
 //   return middleware;
 // }
-
-
-const server = express();
-
-// const middleware = createMiddleware('/templates', '/state');
-// server.use(middleware);
-
-server.listen(5000, () => {
-  console.log('Listening on port 5000');
-});
