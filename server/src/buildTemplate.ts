@@ -34,11 +34,11 @@ const getPathAndId = (templateFullPath: string) => {
 const getTemplateElement = (templateMap: TemplateMap, templatePath: string, id: string): Element => {
   const pathMap = templateMap.get(templatePath);
   if (!pathMap) {
-    throw new Error(`No template at ${path}`);
+    throw new Error(`No template at ${templatePath}`);
   }
   const element = pathMap.get(id);
   if (!element) {
-    throw new Error(`No elements with id ${id} defined in ${path}`)
+    throw new Error(`No elements with id ${id} defined in ${templatePath}`)
   }
   return element;
 }
@@ -58,11 +58,15 @@ const getTemplates = (routePath: string, templateMap: TemplateMap, rootPath: str
       if (!templateAttr) {
         throw new Error(`No template attribute defined by ${element.outerHTML} in ${rootPath}`);
       }
-      return getPathAndId(templateAttr);
+      const { id, templatePath } = getPathAndId(templateAttr);
+      return {
+        templatePath: path.resolve(path.dirname(rootPath), templatePath),
+        id
+      };
     }) 
     .map(({ templatePath, id }) => ({
       element: getTemplateElement(templateMap, templatePath, id),
-      templatePath: path.resolve(rootPath, templatePath),
+      templatePath,
       id
     }))
 
@@ -74,7 +78,7 @@ const getTemplates = (routePath: string, templateMap: TemplateMap, rootPath: str
   return [...templateElements.map(({ element }) => element), ...childTemplateContents];
 }
 
-const buildTemplate = (templatesPath: string, templateMap: TemplateMap, routePath: string) => {
+const getRouteTemplateElements = (templatesPath: string, templateMap: TemplateMap, routePath: string): Element[] => {
   const indexTemplatePath = path.join(templatesPath, 'index.html');
   const indexTemplate = templateMap.get(indexTemplatePath)?.get('main');
   if (!indexTemplate) {
@@ -82,5 +86,10 @@ const buildTemplate = (templatesPath: string, templateMap: TemplateMap, routePat
   }
   return getTemplates(routePath, templateMap, indexTemplatePath, indexTemplate);
 }
+
+const buildTemplate = (templatesPath: string, templateMap: TemplateMap, routePath: string): string => {
+  const elements = getRouteTemplateElements(templatesPath, templateMap, routePath);
+  return elements.map(element => element.outerHTML).join('');
+};
 
 export default buildTemplate;

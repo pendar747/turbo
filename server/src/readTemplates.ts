@@ -4,6 +4,13 @@ import { JSDOM } from 'jsdom';
 import { TemplateMap } from './types';
 import { MAIN_TEMPLATE_KEY } from './constants';
 
+const mapToElement = (template: HTMLTemplateElement): [string, Element] => {
+  const id = template.id || MAIN_TEMPLATE_KEY;
+  const element = new JSDOM(`<div class="template">${template.innerHTML}</div>`)
+    .window.document.querySelector('.template') as Element;
+  return [id, element];
+}
+
 const readFile = async (map: TemplateMap, basePath: string, filename: string) => {
   return new Promise((resolve, reject) => {
     fs.readFile(path.join(basePath, filename), (err, result) => {
@@ -13,7 +20,7 @@ const readFile = async (map: TemplateMap, basePath: string, filename: string) =>
       const dom = new JSDOM(result);
       // TODO: what happens if template file has more than one unnamed template in it?
       const templates: [string, Element][] = Array.from(dom.window.document.querySelectorAll('template') || [])
-        .map(template => [template.id || MAIN_TEMPLATE_KEY, template]);
+        .map(mapToElement);
       map.set(path.join(basePath, filename), new Map(templates));
       resolve();
     });
@@ -35,7 +42,6 @@ const readDirectory = async (map: TemplateMap, basePath: string, dirName?: strin
 const readTemplates = async (templatesPath: string): Promise<TemplateMap> => {
   const map: TemplateMap = new Map();
   await readDirectory(map, templatesPath);
-  console.log(map);
   return map;
 }
 
