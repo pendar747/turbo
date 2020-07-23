@@ -5,9 +5,11 @@ export default class Render {
   private element: Element;
   private _templateId: string;
   private _templatePath: string;
+  private _filePath: string;
 
-  constructor (element: Element) {
+  constructor (element: Element, filePath: string) {
     this.element = element;
+    this._filePath = filePath;
     const { id, templatePath } = this.getPathAndId(); 
     this._templateId = id;
     this._templatePath = templatePath;
@@ -31,7 +33,8 @@ export default class Render {
     return this._templateId;
   }
 
-  getTemplatePathRelativeTo (relativePath: string) {
-    return path.resolve(path.dirname(relativePath), this._templatePath);
+  get fullPath () {
+    return path.resolve(path.dirname(this._filePath), this._templatePath);
   }
+
 }

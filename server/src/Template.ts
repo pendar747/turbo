@@ -4,13 +4,15 @@ import Render from './Render';
 
 export default class Template {
 
-  private element: Element;
-  private _content: Element;
-  private _filePath: string;
+  protected element: Element;
+  protected _content: Element;
+  protected _filePath: string;
+  protected _fileContent: string;
 
-  constructor (element: Element, filePath: string) {
+  constructor (element: Element, filePath: string, fileContent: string) {
     this._filePath = filePath;
     this.element = element;
+    this._fileContent = fileContent;
     this._content = new JSDOM(`<div class="template">${element.innerHTML}</div>`)
       .window.document.querySelector('.template') as Element
   }
@@ -49,10 +51,10 @@ export default class Template {
     const routeElementRenders = this.getRenderElementsMatchingPath(path);
     const nonRouteRenders = this.getNonRouteRenderElements();
     const allElements =  [...routeElementRenders, ...nonRouteRenders];
-    return allElements.map(element => new Render(element));
+    return allElements.map(element => new Render(element, this._filePath));
   }
 
   toString () {
-    this.element.outerHTML;
+    return this.element.outerHTML;
   }
 }
