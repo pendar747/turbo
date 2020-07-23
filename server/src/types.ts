@@ -1,1 +1,3 @@
-export type TemplateMap = Map<string, Map<string, Element>>;
+import TemplateFile from "./TemplateFile";
+
+export type TemplateMap = Map<string, TemplateFile>;

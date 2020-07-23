@@ -1,27 +1,17 @@
 import fs from 'fs';
 import path from 'path';
-import { JSDOM } from 'jsdom';
 import { TemplateMap } from './types';
-import { MAIN_TEMPLATE_KEY } from './constants';
+import TemplateFile from './TemplateFile';
 
-const mapToElement = (template: HTMLTemplateElement): [string, Element] => {
-  const id = template.id || MAIN_TEMPLATE_KEY;
-  const element = new JSDOM(`<div class="template">${template.innerHTML}</div>`)
-    .window.document.querySelector('.template') as Element;
-  return [id, element];
-}
 
 const readFile = async (map: TemplateMap, basePath: string, filename: string) => {
   return new Promise((resolve, reject) => {
-    fs.readFile(path.join(basePath, filename), (err, result) => {
+    const filePath = path.join(basePath, filename);
+    fs.readFile(filePath, { encoding: 'utf-8' }, (err, result) => {
       if (err) {
         return reject(err);
       }
-      const dom = new JSDOM(result);
-      // TODO: what happens if template file has more than one unnamed template in it?
-      const templates: [string, Element][] = Array.from(dom.window.document.querySelectorAll('template') || [])
-        .map(mapToElement);
-      map.set(path.join(basePath, filename), new Map(templates));
+      map.set(filePath, new TemplateFile(filePath, result));
       resolve();
     });
   });
