@@ -9,7 +9,13 @@ export default class DocumentTemplate extends Template {
     const dom = new JSDOM(fileContent);
     super(dom.window.document.body, filePath, fileContent);
     this._dom = dom;
-    this._content = this.element;
+    this._content = this._element;
+  }
+
+  insertTemplates (templates: Template[]) {
+    templates.forEach(template => {
+      this._element.appendChild(template.element);
+    })
   }
 
   toString () {

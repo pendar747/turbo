@@ -4,21 +4,29 @@ import Render from './Render';
 
 export default class Template {
 
-  protected element: Element;
+  protected _element: Element;
   protected _content: Element;
   protected _filePath: string;
   protected _fileContent: string;
 
   constructor (element: Element, filePath: string, fileContent: string) {
     this._filePath = filePath;
-    this.element = element;
+    this._element = element;
     this._fileContent = fileContent;
     this._content = new JSDOM(`<div class="template">${element.innerHTML}</div>`)
       .window.document.querySelector('.template') as Element
   }
 
+  get element () {
+    return this._element;
+  }
+
   get filePath () {
     return this._filePath;
+  }
+
+  get id () {
+    return this.element.id;
   }
 
   private getRouteElementMatchingPath (path: string): Element|undefined {
@@ -55,6 +63,6 @@ export default class Template {
   }
 
   toString () {
-    return this.element.outerHTML;
+    return this._element.outerHTML;
   }
 }

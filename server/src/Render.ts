@@ -22,9 +22,12 @@ export default class Render {
     }
     const hashIndex = templateAttr.indexOf('#');
     if (hashIndex >= 0) {
-      const templatePath = templateAttr.slice(hashIndex);
+      const templatePathPart = templateAttr.slice(0, hashIndex);
       const id = templateAttr.slice(hashIndex + 1);
-      return { id, templatePath: templatePath + '.html' };
+      const templatePath = templatePathPart.length > 0 
+        ? templatePathPart + '.html' 
+        : this._filePath; 
+      return { id, templatePath };
     }
     return { id: MAIN_TEMPLATE_KEY, templatePath: templateAttr + '.html' };
   }

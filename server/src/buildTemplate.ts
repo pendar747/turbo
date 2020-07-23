@@ -31,18 +31,15 @@ const getTemplates = (routePath: string, templateMap: TemplateMap, template: Tem
   return [...templateElements, ...childTemplateContents];
 }
 
-const getRouteTemplateElements = (templatesPath: string, templateMap: TemplateMap, routePath: string): Template[] => {
+const buildTemplate = (templatesPath: string, templateMap: TemplateMap, routePath: string): string => {
   const indexTemplatePath = path.join(templatesPath, 'index.html');
   const indexTemplate = templateMap.get(indexTemplatePath)?.getDocumentTemplate();
   if (!indexTemplate) {
     throw new Error(`No index template found at ${templatesPath}`);
   }
-  return getTemplates(routePath, templateMap, indexTemplate);
+  const templates = getTemplates(routePath, templateMap, indexTemplate);
+  indexTemplate.insertTemplates(templates);
+  return indexTemplate.toString();
 }
-
-const buildTemplate = (templatesPath: string, templateMap: TemplateMap, routePath: string): string => {
-  const templates = getRouteTemplateElements(templatesPath, templateMap, routePath);
-  return templates.map(template => template.toString()).join('');
-};
 
 export default buildTemplate;

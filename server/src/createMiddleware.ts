@@ -8,6 +8,7 @@ const createMiddleware = async (templatesPath: string, statePath: string) => {
 
   const middleware = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const response = buildTemplate(templatesPath, templateMap, req.path);
+    console.log(response);
     res.contentType('html').send(response);
   };
 
