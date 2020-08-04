@@ -11,7 +11,8 @@ const readFile = async (map: TemplateMap, basePath: string, templatesRootPath: s
       if (err) {
         return reject(err);
       }
-      map.set(filePath, new TemplateFile(filePath, result, templatesRootPath));
+      const template = new TemplateFile(filePath, result, templatesRootPath);
+      map.set(template.urlPath, template);
       resolve();
     });
   });

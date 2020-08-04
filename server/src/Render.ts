@@ -6,13 +6,23 @@ export default class Render {
   private _templateId: string;
   private _templatePath: string;
   private _filePath: string;
+  private _templatesPath: string;
 
-  constructor (element: Element, filePath: string) {
+  constructor (element: Element, filePath: string, templatesPath: string) {
+    this._templatesPath = templatesPath;
     this.element = element;
     this._filePath = filePath;
     const { id, templatePath } = this.getPathAndId(); 
     this._templateId = id;
     this._templatePath = templatePath;
+  }
+
+  private get absoluteTemplatePath () {
+    return this.templateUrlPath + `#${this.templateId}`;
+  }
+
+  makeTemplatePathsAbsolute () {
+    this.element.setAttribute('template', this.absoluteTemplatePath);
   }
   
   private getPathAndId () {
@@ -22,8 +32,8 @@ export default class Render {
     }
     const hashIndex = templateAttr.indexOf('#');
     if (hashIndex >= 0) {
-      const templatePathPart = templateAttr.slice(0, hashIndex);
       const id = templateAttr.slice(hashIndex + 1);
+      const templatePathPart = templateAttr.slice(0, hashIndex);
       const templatePath = templatePathPart.length > 0 
         ? templatePathPart + '.html' 
         : this._filePath; 
@@ -37,7 +47,16 @@ export default class Render {
   }
 
   get fullPath () {
-    return path.resolve(path.dirname(this._filePath), this._templatePath);
+    const pathWithExt = path.resolve(path.dirname(this._filePath), this._templatePath);
+    const { dir, name } = path.parse(pathWithExt);
+    return path.join(dir, name);
+  }
+
+  get templateUrlPath () {
+    const rawPath = this._templatesPath.length > this.fullPath.length 
+        ? this.fullPath
+        : this.fullPath.slice(this._templatesPath.length);
+    return rawPath.indexOf('/templates') == 0 ? rawPath : path.join('/templates', rawPath);
   }
 
 }

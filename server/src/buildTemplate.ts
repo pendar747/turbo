@@ -21,7 +21,7 @@ const getTemplates = (routePath: string, templateMap: TemplateMap, template: Tem
   const allRenderElements = template.getAllRenderElementsMatchingPath(routePath);
 
   const templateElements = allRenderElements
-    .map((render) => getTemplate(templateMap, render.fullPath, render.templateId))
+    .map((render) => getTemplate(templateMap, render.templateUrlPath, render.templateId))
 
   const childTemplateContents =
     templateElements
@@ -32,10 +32,10 @@ const getTemplates = (routePath: string, templateMap: TemplateMap, template: Tem
 }
 
 const buildTemplate = (templatesPath: string, templateMap: TemplateMap, routePath: string): string => {
-  const indexTemplatePath = path.join(templatesPath, 'index.html');
+  const indexTemplatePath = '/templates/index';
   const indexTemplate = templateMap.get(indexTemplatePath)?.getDocumentTemplate();
   if (!indexTemplate) {
-    throw new Error(`No index template found at ${templatesPath}`);
+    throw new Error(`No index template found at ${indexTemplatePath}`);
   }
   const templates = getTemplates(routePath, templateMap, indexTemplate);
   indexTemplate.insertTemplates(templates);
