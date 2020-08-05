@@ -25,7 +25,7 @@ const config: webpack.Configuration = {
   output: {
     filename: 'bundle.js',
     path: '/dist',
-    publicPath: '/'
+    publicPath: '/scripts/'
   }
 };
 

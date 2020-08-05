@@ -15,7 +15,7 @@ const startServer = async () => {
   const assets = await compile();
   server.use('/scripts', webpackMiddleware(assets));
 
-  const middleware = await createMiddleware(templatePath, statePath);
+  const middleware = await createMiddleware(templatePath, assets);
   server.use(middleware);
 
   server.listen(5000, () => {

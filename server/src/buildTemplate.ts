@@ -1,6 +1,7 @@
 import { TemplateMap } from "./types";
 import path from 'path';
 import Template from "./Template";
+import { Assets } from "./webpack/types";
 
 const getTemplate = (templateMap: TemplateMap, templatePath: string, id: string): Template => {
   const pathMap = templateMap.get(templatePath);
@@ -31,7 +32,7 @@ const getTemplates = (routePath: string, templateMap: TemplateMap, template: Tem
   return [...templateElements, ...childTemplateContents];
 }
 
-const buildTemplate = (templatesPath: string, templateMap: TemplateMap, routePath: string): string => {
+const buildTemplate = (templateMap: TemplateMap, routePath: string, assets: Assets): string => {
   const indexTemplatePath = '/templates/index';
   const indexTemplate = templateMap.get(indexTemplatePath)?.getDocumentTemplate();
   if (!indexTemplate) {
@@ -39,6 +40,7 @@ const buildTemplate = (templatesPath: string, templateMap: TemplateMap, routePat
   }
   const templates = getTemplates(routePath, templateMap, indexTemplate);
   indexTemplate.insertTemplates(templates);
+  indexTemplate.insertAssets(assets);
   return indexTemplate.toString();
 }
 

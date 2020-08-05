@@ -1,5 +1,7 @@
 import Template from "./Template";
 import { JSDOM } from 'jsdom';
+import { Assets } from "./webpack/types";
+import path from 'path';
 
 export default class DocumentTemplate extends Template {
 
@@ -17,6 +19,17 @@ export default class DocumentTemplate extends Template {
       template.makeAllReferencedTemplatePathsAbsolute();
       this._element.appendChild(template.element);
     })
+  }
+
+  insertAssets (assets: Assets) {
+    assets
+      .filter(asset => path.extname(asset.filename) === '.js')
+      .forEach(({ filename }) => {
+        const scriptElement = this._dom.window.document.createElement('script');
+        scriptElement.src = `/scripts/${filename}`;
+        scriptElement.type = 'text/javascript';
+        this._element.appendChild(scriptElement);
+      });
   }
 
   toString () {
