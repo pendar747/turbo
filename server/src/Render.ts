@@ -56,7 +56,7 @@ export default class Render {
     const rawPath = this._templatesPath.length > this.fullPath.length 
         ? this.fullPath
         : this.fullPath.slice(this._templatesPath.length);
-    return rawPath.indexOf('/templates') == 0 ? rawPath : path.join('/templates', rawPath);
+    return path.join('/', rawPath);
   }
 
 }

@@ -2,6 +2,7 @@ import { JSDOM } from 'jsdom';
 import { match } from 'path-to-regexp';
 import Render from './Render';
 import { MAIN_TEMPLATE_KEY } from './constants';
+import path from 'path';
 
 export default class Template {
 
@@ -80,7 +81,8 @@ export default class Template {
   }
 
   private get filePathRelativeToTemplatesPath () {
-    return this.filePath.slice(this._templatesPath.length);
+    const { dir, name } = path.parse(this.filePath.slice(this._templatesPath.length));
+    return path.join(dir, name);
   }
 
   toString () {

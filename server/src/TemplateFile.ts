@@ -30,7 +30,7 @@ export default class TemplateFile {
   get urlPath () {
     const relativePath = this._filePath.slice(this._templatesRootPath.length);
     const { dir, name } = path.parse(relativePath);
-    return path.join('/templates', dir, name);
+    return path.join('/', dir, name);
   }
 
   getTemplate (path: string) {

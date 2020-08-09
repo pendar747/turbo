@@ -12,6 +12,17 @@ export default class DocumentTemplate extends Template {
     super(dom.window.document.body, filePath, fileContent, templatesPath);
     this._dom = dom;
     this._content = this._element;
+    this.makeTemplatePathsAbsolute();
+  }
+
+  makeTemplatePathsAbsolute () {
+    const templates = Array.from(this._content.querySelectorAll('template') || [])
+      .map(element => new Template(element, this.filePath, this._fileContent, this._templatesPath));
+    const allRenders = templates.map(template => template.getAllRenders()).flat();
+    allRenders.forEach(render => render.makeTemplatePathsAbsolute());
+    this._content.querySelectorAll('template')
+      .forEach(template => template.remove());
+    // templates.forEach(template => this._content.appendChild(template.element));
   }
 
   insertTemplates (templates: Template[]) {
@@ -33,6 +44,7 @@ export default class DocumentTemplate extends Template {
   }
 
   toString () {
+    this._dom.window.document.body.innerHTML = this._content.innerHTML;
     return this._dom.serialize();
   }
 }

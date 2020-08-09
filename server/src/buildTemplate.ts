@@ -33,7 +33,7 @@ const getTemplates = (routePath: string, templateMap: TemplateMap, template: Tem
 }
 
 const buildTemplate = (templateMap: TemplateMap, routePath: string, assets: Assets): string => {
-  const indexTemplatePath = '/templates/index';
+  const indexTemplatePath = '/index';
   const indexTemplate = templateMap.get(indexTemplatePath)?.getDocumentTemplate();
   if (!indexTemplate) {
     throw new Error(`No index template found at ${indexTemplatePath}`);

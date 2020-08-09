@@ -5,6 +5,9 @@
   "main": "dist/index.js",
   "author": "Pendar Ghalamchi",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
   "bin": {
     "serve-pernix": "./dist/serve.js"
   },
